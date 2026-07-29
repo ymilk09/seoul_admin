@@ -1187,70 +1187,98 @@
     closeApprovalModal();
   }
 
-  /* 상신 처리 */
-  async function submitDraft() {
-    const titleInput = document.getElementById('draft-title');
-    const title = titleInput ? titleInput.value.trim() : '';
+ /* 🚀 [상신] 기능 (파일 업로드 포함) */
+async function submitDraft() {
+  const titleInput = document.getElementById('draft-title');
+  const title = titleInput ? titleInput.value.trim() : '';
 
-    if (!title) {
-      showAlert('입력 오류', '문서 제목을 입력해 주세요.');
-      return;
-    }
-
-    const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
-    if (targetItems.length < 2) {
-      showAlert('결재선 오류', '기안자 외 최소 1명 이상의 결재자를 지정해 주세요.');
-      return;
-    }
-
-    const nextApproverId = targetItems[1].getAttribute('data-id');
-
-    try {
-      if (!supabaseClient) {
-        showAlert('오류', 'Supabase 클라이언트가 초기화되지 않았습니다.');
-        return;
-      }
-
-      const { data: docData, error: docError } = await supabaseClient
-        .from('documents')
-        .insert([
-          {
-            title: title,
-            drafter_id: currentUser.id,
-            current_approver_id: nextApproverId,
-            status: 'PENDING'
-          }
-        ])
-        .select();
-
-      if (docError) throw docError;
-
-      const createdDocId = docData[0].id;
-
-      const approvalLines = targetItems.map((item, index) => ({
-        doc_id: createdDocId,
-        approver_id: item.getAttribute('data-id'),
-        approver_name: item.getAttribute('data-name'),
-        step_order: index + 1,
-        status: index === 0 ? 'APPROVED' : 'WAIT'
-      }));
-
-      const { error: lineError } = await supabaseClient
-        .from('approval_lines')
-        .insert(approvalLines);
-
-      if (lineError) throw lineError;
-
-      showAlert('상신 완료', '성공적으로 문서가 상신되었습니다!');
-      setTimeout(() => {
-        location.href = 'index.html';
-      }, 1500);
-
-    } catch (err) {
-      console.error('Supabase Error:', err);
-      showAlert('저장 실패', '문서 상신 중 오류가 발생했습니다: ' + err.message);
-    }
+  if (!title) {
+    showAlert('입력 오류', '문서 제목을 입력해 주세요.');
+    return;
   }
+
+  const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
+  if (targetItems.length < 2) {
+    showAlert('결재선 오류', '기안자 외 최소 1명 이상의 결재자를 지정해 주세요.');
+    return;
+  }
+
+  const nextApproverId = targetItems[1].getAttribute('data-id');
+
+  try {
+    if (!supabaseClient) {
+      showAlert('오류', 'Supabase 클라이언트가 초기화되지 않았습니다.');
+      return;
+    }
+
+    // 📁 1. 첨부파일 업로드 처리
+    const fileInput = document.getElementById('body-file-input'); // HTML의 file input ID에 맞춰주세요
+    let fileUrl = null;
+
+    if (fileInput && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      // 파일명이 중복되지 않도록 타임스탬프 추가
+      const filePath = `documents/${Date.now()}_${file.name}`;
+
+      const { data: storageData, error: storageError } = await supabaseClient
+        .storage
+        .from('attachments') // 아까 만든 스토리지 버킷 이름
+        .upload(filePath, file);
+
+      if (storageError) throw storageError;
+
+      // 업로드된 파일의 공개 URL 가져오기
+      const { data: publicUrlData } = supabaseClient
+        .storage
+        .from('attachments')
+        .getPublicUrl(filePath);
+
+      fileUrl = publicUrlData.publicUrl;
+    }
+
+    // 📝 2. documents 테이블에 문서 저장 (file_url 포함)
+    const { data: docData, error: docError } = await supabaseClient
+      .from('documents')
+      .insert([
+        {
+          title: title,
+          drafter_id: currentUser.id,
+          current_approver_id: nextApproverId,
+          status: 'PENDING',
+          file_url: fileUrl // 파일 다운로드 링크 저장
+        }
+      ])
+      .select();
+
+    if (docError) throw docError;
+
+    const createdDocId = docData[0].id;
+
+    // 👥 3. approval_lines 테이블에 결재선 저장
+    const approvalLines = targetItems.map((item, index) => ({
+      doc_id: createdDocId,
+      approver_id: item.getAttribute('data-id'),
+      approver_name: item.getAttribute('data-name'),
+      step_order: index + 1,
+      status: index === 0 ? 'APPROVED' : 'WAIT'
+    }));
+
+    const { error: lineError } = await supabaseClient
+      .from('approval_lines')
+      .insert(approvalLines);
+
+    if (lineError) throw lineError;
+
+    showAlert('상신 완료', '성공적으로 문서와 파일이 상신되었습니다!');
+    setTimeout(() => {
+      location.href = 'index.html';
+    }, 1500);
+
+  } catch (err) {
+    console.error('Supabase Error:', err);
+    showAlert('저장 실패', '상신 중 오류가 발생했습니다: ' + err.message);
+  }
+}
 
     /* 커스텀 모달 출력 함수 */
     function showAlert(title, message) {
