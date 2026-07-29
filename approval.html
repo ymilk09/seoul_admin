@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>문서관리시스템</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       margin: 0;
@@ -739,7 +742,7 @@
     <div class="page-header">
       <h2 class="page-title">기안문 작성</h2>
       <div class="action-btns">
-        <button class="btn btn-submit">상신</button>
+        <button class="btn btn-submit" onclick="submitDraft()">상신</button>
       </div>
     </div>
 
@@ -776,7 +779,7 @@
           <button type="button" onclick="openApprovalModal()" style="background:none; border:none; color:#2563eb; font-weight:700; cursor:pointer; font-size:0.85rem;">+ 결재선 변경</button>
         </div>
         <div class="approval-steps" id="display-approval-steps">
-          </div>
+        </div>
       </div>
 
       <div class="form-group full-width" style="margin-bottom: 30px;">
@@ -835,7 +838,7 @@
 
         <div class="line-target-panel">
           <div class="target-list-box" id="target-approval-list">
-            </div>
+          </div>
         </div>
 
       </div>
@@ -857,49 +860,85 @@
     </div>
   </div>
 
-  <script>
-    /* 🔑 현재 세션/로그인 사용자 정보 */
-    const currentUser = {
-      id: 'lim.2',
-      name: '김대표',
-      dept: '대표실'
-    };
+<script>
+  /* 🔑 1. Supabase 연동 정보 */
+  const SUPABASE_URL = 'https://arwwkmoeypsuzayrgkjd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyd3drbW9leXBzdXpheXJna2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMjIyMTAsImV4cCI6MjEwMDg5ODIxMH0.sbfZXyCgQJli_6hUGMv2xtNwCB5aEWjReMyrngFT-F4';
+  
+  // Supabase 클라이언트 초기화
+  const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-    /* 페이지 로드 시 사용자 정보 동기화 및 초기 결재선 구성 */
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. 유틸리티 바 로그인 표시 및 기안부서 연동
-      const userInfoText = document.getElementById('user-info-text');
-      if (userInfoText) {
-        userInfoText.innerText = `👤 ${currentUser.name}(${currentUser.id}) | ${currentUser.dept}`;
-      }
-      document.getElementById('draft-dept-input').value = currentUser.dept;
+  /* 🔑 현재 세션/로그인 사용자 정보 */
+  const currentUser = {
+    id: 'lim.2',
+    name: '김대표',
+    dept: '대표실'
+  };
 
-      // 2. 초기 기안자 결재선 세팅 (기존 더미 결재자 제거됨)
-      initDraftUser();
-    });
-
-    function initDraftUser() {
-      const userText = `${currentUser.name}(${currentUser.id}) | ${currentUser.dept}`;
-      
-      // 메인 화면 반영
-      const displayContainer = document.getElementById('display-approval-steps');
-      displayContainer.innerHTML = `
-        <div class="step-box">
-          <div class="step-role">기안</div>
-          <div class="step-name">${userText}</div>
-        </div>
-      `;
-
-      // 모달 화면 반영
-      const targetList = document.getElementById('target-approval-list');
-      targetList.innerHTML = `
-        <div class="target-item" data-role="기안" data-id="${currentUser.id}" data-name="${userText}">
-          <div class="info"><span class="badge">기안</span><span>${userText}</span></div>
-        </div>
-      `;
+  /* DOM 로드 시 실행 */
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. 유틸리티 바 로그인 표시 및 기안부서 동기화
+    const userInfoText = document.getElementById('user-info-text');
+    if (userInfoText) {
+      userInfoText.innerText = '👤 ' + currentUser.name + '(' + currentUser.id + ') | ' + currentUser.dept;
+    }
+    
+    const draftDeptInput = document.getElementById('draft-dept-input');
+    if (draftDeptInput) {
+      draftDeptInput.value = currentUser.dept;
     }
 
-    /* 문서카드 옵션 추가 */
+    // 2. 초기 기안자 결재선 세팅
+    initDraftUser();
+
+    // 3. 네비게이션 드롭다운 이벤트 등록
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentItem = this.parentElement;
+        document.querySelectorAll('.nav-item').forEach(item => {
+          if (item !== currentItem) item.classList.remove('active');
+        });
+        currentItem.classList.toggle('active');
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-item')) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      }
+    });
+
+    // 4. 문서카드 옵션 추가
+    initDocCards();
+  });
+
+  /* 기안자 결재선 초기화 */
+  function initDraftUser() {
+    const userText = currentUser.name + '(' + currentUser.id + ') | ' + currentUser.dept;
+    
+    // 메인 화면 반영
+    const displayContainer = document.getElementById('display-approval-steps');
+    if (displayContainer) {
+      displayContainer.innerHTML = 
+        '<div class="step-box">' +
+          '<div class="step-role">기안</div>' +
+          '<div class="step-name">' + userText + '</div>' +
+        '</div>';
+    }
+
+    // 모달 화면 반영
+    const targetList = document.getElementById('target-approval-list');
+    if (targetList) {
+      targetList.innerHTML = 
+        '<div class="target-item" data-role="기안" data-id="' + currentUser.id + '" data-name="' + userText + '">' +
+          '<div class="info"><span class="badge">기안</span><span>' + userText + '</span></div>' +
+        '</div>';
+    }
+  }
+
+  /* 문서 카드 목록 초기화 */
+  function initDocCards() {
     const DOCUMENT_CARDS = [
       "과제카드를 설정하세요",
       "국가정책수립",
@@ -913,203 +952,305 @@
     ];
 
     const cardSelect = document.getElementById('doc-card-select');
-    DOCUMENT_CARDS.forEach(cardName => {
-      const option = document.createElement('option');
-      option.value = cardName;
-      option.textContent = cardName;
-      cardSelect.appendChild(option);
-    });
+    if (cardSelect) {
+      DOCUMENT_CARDS.forEach(cardName => {
+        const option = document.createElement('option');
+        option.value = cardName;
+        option.textContent = cardName;
+        cardSelect.appendChild(option);
+      });
+    }
+  }
 
-    /* 공개구분 변경 시 근거 입력란 토글 */
-    function toggleBasisInput() {
-      const publicType = document.getElementById('public-type').value;
-      const basisGroup = document.getElementById('basis-group');
+  /* 커스텀 경고 모달 출력 */
+  function showAlert(title, message) {
+    const alertTitle = document.getElementById('alertTitle');
+    const alertMessage = document.getElementById('alertMessage');
+    const customAlert = document.getElementById('customAlert');
 
+    if (alertTitle) alertTitle.innerText = title;
+    if (alertMessage) alertMessage.innerText = message;
+    if (customAlert) customAlert.style.display = 'flex';
+  }
+
+  function closeAlert() {
+    const customAlert = document.getElementById('customAlert');
+    if (customAlert) customAlert.style.display = 'none';
+  }
+
+  /* 파일 선택 처리 함수 */
+  function handleFileSelect(event, listId) {
+    const files = event.target.files;
+    const fileList = document.getElementById(listId);
+    if (!fileList) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const li = document.createElement('li');
+      li.className = 'file-item';
+      
+      const fileSize = (files[i].size / 1024).toFixed(1);
+      li.innerHTML = '📄 ' + files[i].name + ' (' + fileSize + ' KB) <button type="button" onclick="this.parentElement.remove()">✕</button>';
+      
+      fileList.appendChild(li);
+    }
+  }
+
+  /* 공개구분 변경시 토글 */
+  function toggleBasisInput() {
+    const publicType = document.getElementById('public-type').value;
+    const basisGroup = document.getElementById('basis-group');
+
+    if (basisGroup) {
       if (publicType === 'private' || publicType === 'partial') {
         basisGroup.style.display = 'flex';
       } else {
         basisGroup.style.display = 'none';
       }
     }
+  }
 
-    /* 더미 사용자 데이터 (검색용) */
-    const mockUsers = [
-      { id: 'lee.kw', name: '이카워크', dept: '카카오워크' },
-      { id: 'oh.kw', name: '오카워크', dept: '카카오워크2' },
-      { id: 'park.kw', name: '박카워크', dept: '카카오워크3' },
-      { id: 'choi.kw', name: '최카워크', dept: '카카오워크4' }
-    ];
+  /* 더미 사용자 데이터 */
+  const mockUsers = [
+    { id: 'lee.kw', name: '이카워크', dept: '카카오워크' },
+    { id: 'oh.kw', name: '오카워크', dept: '카카오워크2' },
+    { id: 'park.kw', name: '박카워크', dept: '카카오워크3' },
+    { id: 'choi.kw', name: '최카워크', dept: '카카오워크4' }
+  ];
 
-    let currentSelectedUser = null;
+  let currentSelectedUser = null;
 
-    /* 결재선 모달 토글 및 설정 */
-    function openApprovalModal() {
-      document.getElementById('approval-modal').style.display = 'flex';
+  /* 결재선 지정 모달 제어 */
+  function openApprovalModal() {
+    const modal = document.getElementById('approval-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeApprovalModal() {
+    const modal = document.getElementById('approval-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  /* 검색 기능 */
+  function performUserSearch() {
+    const query = document.getElementById('userSearchInput').value.trim();
+    const listEl = document.getElementById('searchResultsList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '';
+    currentSelectedUser = null;
+
+    if (!query) {
+      listEl.innerHTML = '<div class="no-search-msg">검색어를 입력해 주세요.</div>';
+      return;
     }
 
-    function closeApprovalModal() {
-      document.getElementById('approval-modal').style.display = 'none';
+    const results = mockUsers.filter(u => u.name.includes(query) || u.id.includes(query) || u.dept.includes(query));
+
+    if (results.length === 0) {
+      listEl.innerHTML = '<div class="no-search-msg">검색 결과가 없습니다.</div>';
+      return;
     }
 
-    /* 검색 기능 */
-    function performUserSearch() {
-      const query = document.getElementById('userSearchInput').value.trim();
-      const listEl = document.getElementById('searchResultsList');
-      listEl.innerHTML = '';
-      currentSelectedUser = null;
-
-      if (!query) {
-        listEl.innerHTML = '<div class="no-search-msg">검색어를 입력해 주세요.</div>';
-        return;
-      }
-
-      const results = mockUsers.filter(u => u.name.includes(query) || u.id.includes(query) || u.dept.includes(query));
-
-      if (results.length === 0) {
-        listEl.innerHTML = '<div class="no-search-msg">검색 결과가 없습니다.</div>';
-        return;
-      }
-
-      results.forEach(user => {
-        const item = document.createElement('div');
-        item.className = 'user-item-node';
-        item.innerText = `${user.name}(${user.id}) | ${user.dept}`;
-        item.onclick = () => {
-          document.querySelectorAll('.user-item-node').forEach(node => node.classList.remove('selected'));
-          item.classList.add('selected');
-          currentSelectedUser = user;
-        };
-        listEl.appendChild(item);
-      });
-    }
-
-    /* 대상자 지정 추가 */
-    function addSelectedUser(role) {
-      if (!currentSelectedUser) {
-        showAlert('선택 안내', '좌측 검색 결과에서 대상자를 먼저 선택해 주세요.');
-        return;
-      }
-
-      const existingItems = document.querySelectorAll('#target-approval-list .target-item');
-      let isConflict = false;
-
-      existingItems.forEach(item => {
-        const itemRole = item.getAttribute('data-role');
-        const itemId = item.getAttribute('data-id');
-
-        if (itemId === currentSelectedUser.id) {
-          if ((role === '결재' || role === '협조') && (itemRole === '결재' || itemRole === '협조')) {
-            isConflict = true;
-          }
-        }
-      });
-
-      if (isConflict) {
-        showAlert('결재선 설정 오류', '동일한 사용자가 결재와 협조에 동시에 지정될 수 없습니다.');
-        return;
-      }
-
-      const list = document.getElementById('target-approval-list');
-      const itemText = `${currentSelectedUser.name}(${currentSelectedUser.id}) | ${currentSelectedUser.dept}`;
-
+    results.forEach(user => {
       const item = document.createElement('div');
-      item.className = 'target-item';
-      item.setAttribute('draggable', 'true');
-      item.setAttribute('data-role', role);
-      item.setAttribute('data-id', currentSelectedUser.id);
-      item.setAttribute('data-name', itemText);
-      item.innerHTML = `
-        <div class="info"><span class="badge">${role}</span><span>${itemText}</span></div>
-        <button class="btn-del" onclick="this.parentElement.remove()">✕</button>
-      `;
+      item.className = 'user-item-node';
+      item.innerText = user.name + '(' + user.id + ') | ' + user.dept;
+      item.onclick = () => {
+        document.querySelectorAll('.user-item-node').forEach(node => node.classList.remove('selected'));
+        item.classList.add('selected');
+        currentSelectedUser = user;
+      };
+      listEl.appendChild(item);
+    });
+  }
 
-      // 새로 생성된 결재선 노드에 드래그 이벤트 연결
-      addDragAndDropEvents(item);
-      list.appendChild(item);
+  /* 결재자/협조자 추가 */
+  function addSelectedUser(role) {
+    if (!currentSelectedUser) {
+      showAlert('선택 안내', '좌측 검색 결과에서 대상자를 먼저 선택해 주세요.');
+      return;
     }
 
-    /* 🔄 드래그 앤 드롭 순서 변경 기능 구현 */
-    const targetListBox = document.getElementById('target-approval-list');
+    const existingItems = document.querySelectorAll('#target-approval-list .target-item');
+    let isConflict = false;
 
-    function addDragAndDropEvents(item) {
-      // 기안자는 순서 고정
-      if (item.getAttribute('data-role') === '기안') return;
+    existingItems.forEach(item => {
+      const itemRole = item.getAttribute('data-role');
+      const itemId = item.getAttribute('data-id');
 
-      item.addEventListener('dragstart', (e) => {
-        item.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      });
-
-      item.addEventListener('dragend', () => {
-        item.classList.remove('dragging');
-        document.querySelectorAll('.target-item').forEach(el => el.classList.remove('drag-over'));
-      });
-
-      item.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        item.classList.add('drag-over');
-      });
-
-      item.addEventListener('dragleave', () => {
-        item.classList.remove('drag-over');
-      });
-
-      item.addEventListener('drop', (e) => {
-        e.preventDefault();
-        item.classList.remove('drag-over');
-        const draggingItem = document.querySelector('.dragging');
-
-        if (draggingItem && draggingItem !== item) {
-          const allItems = [...targetListBox.querySelectorAll('.target-item')];
-          const draggingIdx = allItems.indexOf(draggingItem);
-          const targetIdx = allItems.indexOf(item);
-
-          // 기안자(index 0)의 위쪽으로는 이동 불허
-          if (targetIdx === 0 && draggingIdx > 0) return;
-
-          if (draggingIdx < targetIdx) {
-            item.after(draggingItem);
-          } else {
-            item.before(draggingItem);
-          }
+      if (itemId === currentSelectedUser.id) {
+        if ((role === '결재' || role === '협조') && (itemRole === '결재' || itemRole === '협조')) {
+          isConflict = true;
         }
-      });
+      }
+    });
+
+    if (isConflict) {
+      showAlert('결재선 설정 오류', '동일한 사용자가 결재와 협조에 동시에 지정될 수 없습니다.');
+      return;
     }
 
-    /* 결재선 적용 */
-    function applyApprovalLine() {
-      const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
-      
-      if (targetItems.length === 0) {
-        showAlert('적용 불가', '결재선 목록이 비어있습니다.');
-        return;
+    const list = document.getElementById('target-approval-list');
+    const itemText = currentSelectedUser.name + '(' + currentSelectedUser.id + ') | ' + currentSelectedUser.dept;
+
+    const item = document.createElement('div');
+    item.className = 'target-item';
+    item.setAttribute('draggable', 'true');
+    item.setAttribute('data-role', role);
+    item.setAttribute('data-id', currentSelectedUser.id);
+    item.setAttribute('data-name', itemText);
+    item.innerHTML = 
+      '<div class="info"><span class="badge">' + role + '</span><span>' + itemText + '</span></div>' +
+      '<button class="btn-del" onclick="this.parentElement.remove()">✕</button>';
+
+    addDragAndDropEvents(item);
+    list.appendChild(item);
+  }
+
+  /* 드래그 앤 드롭 이벤터 */
+  function addDragAndDropEvents(item) {
+    const targetListBox = document.getElementById('target-approval-list');
+    if (item.getAttribute('data-role') === '기안') return;
+
+    item.addEventListener('dragstart', (e) => {
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      document.querySelectorAll('.target-item').forEach(el => el.classList.remove('drag-over'));
+    });
+
+    item.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      item.classList.add('drag-over');
+    });
+
+    item.addEventListener('dragleave', () => {
+      item.classList.remove('drag-over');
+    });
+
+    item.addEventListener('drop', (e) => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      const draggingItem = document.querySelector('.dragging');
+
+      if (draggingItem && draggingItem !== item && targetListBox) {
+        const allItems = [...targetListBox.querySelectorAll('.target-item')];
+        const draggingIdx = allItems.indexOf(draggingItem);
+        const targetIdx = allItems.indexOf(item);
+
+        if (targetIdx === 0 && draggingIdx > 0) return;
+
+        if (draggingIdx < targetIdx) {
+          item.after(draggingItem);
+        } else {
+          item.before(draggingItem);
+        }
       }
+    });
+  }
 
-      const lastItem = targetItems[targetItems.length - 1];
-      const lastRole = lastItem.getAttribute('data-role');
+  /* 결재선 적용 */
+  function applyApprovalLine() {
+    const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
+    
+    if (targetItems.length === 0) {
+      showAlert('적용 불가', '결재선 목록이 비어있습니다.');
+      return;
+    }
 
-      if (lastRole === '협조') {
-        showAlert('결재선 설정 오류', '협조는 결재선의 마지막 순서에 위치할 수 없습니다.');
-        return;
-      }
+    const lastItem = targetItems[targetItems.length - 1];
+    const lastRole = lastItem.getAttribute('data-role');
 
-      // 메인 화면 반영
-      const displayContainer = document.getElementById('display-approval-steps');
+    if (lastRole === '협조') {
+      showAlert('결재선 설정 오류', '협조는 결재선의 마지막 순서에 위치할 수 없습니다.');
+      return;
+    }
+
+    const displayContainer = document.getElementById('display-approval-steps');
+    if (displayContainer) {
       displayContainer.innerHTML = '';
-
       targetItems.forEach(item => {
         const role = item.getAttribute('data-role');
         const name = item.getAttribute('data-name');
         
         const step = document.createElement('div');
         step.className = 'step-box';
-        step.innerHTML = `<div class="step-role">${role}</div><div class="step-name">${name}</div>`;
+        step.innerHTML = '<div class="step-role">' + role + '</div><div class="step-name">' + name + '</div>';
         displayContainer.appendChild(step);
       });
-
-      closeApprovalModal();
     }
+
+    closeApprovalModal();
+  }
+
+  /* 상신 처리 */
+  async function submitDraft() {
+    const titleInput = document.getElementById('draft-title');
+    const title = titleInput ? titleInput.value.trim() : '';
+
+    if (!title) {
+      showAlert('입력 오류', '문서 제목을 입력해 주세요.');
+      return;
+    }
+
+    const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
+    if (targetItems.length < 2) {
+      showAlert('결재선 오류', '기안자 외 최소 1명 이상의 결재자를 지정해 주세요.');
+      return;
+    }
+
+    const nextApproverId = targetItems[1].getAttribute('data-id');
+
+    try {
+      if (!supabaseClient) {
+        showAlert('오류', 'Supabase 클라이언트가 초기화되지 않았습니다.');
+        return;
+      }
+
+      const { data: docData, error: docError } = await supabaseClient
+        .from('documents')
+        .insert([
+          {
+            title: title,
+            drafter_id: currentUser.id,
+            current_approver_id: nextApproverId,
+            status: 'PENDING'
+          }
+        ])
+        .select();
+
+      if (docError) throw docError;
+
+      const createdDocId = docData[0].id;
+
+      const approvalLines = targetItems.map((item, index) => ({
+        doc_id: createdDocId,
+        approver_id: item.getAttribute('data-id'),
+        approver_name: item.getAttribute('data-name'),
+        step_order: index + 1,
+        status: index === 0 ? 'APPROVED' : 'WAIT'
+      }));
+
+      const { error: lineError } = await supabaseClient
+        .from('approval_lines')
+        .insert(approvalLines);
+
+      if (lineError) throw lineError;
+
+      showAlert('상신 완료', '성공적으로 문서가 상신되었습니다!');
+      setTimeout(() => {
+        location.href = 'index.html';
+      }, 1500);
+
+    } catch (err) {
+      console.error('Supabase Error:', err);
+      showAlert('저장 실패', '문서 상신 중 오류가 발생했습니다: ' + err.message);
+    }
+  }
 
     /* 커스텀 모달 출력 함수 */
     function showAlert(title, message) {
@@ -1154,7 +1295,7 @@
       if (!e.target.closest('.nav-item')) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       }
-    });	
+    }); 
   </script>
 
 </body>
