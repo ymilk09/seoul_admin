@@ -795,7 +795,7 @@
             <div class="file-drop-area" onclick="document.getElementById('body-files').click()">
               클릭하여 본문 파일 선택 (HWP, PDF 각 1부)
             </div>
-<input type="file" id="body-file-input" onchange="handleFileSelect(event, 'file-list')">
+<input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'file-list')">
             <ul class="file-list" id="body-file-list"></ul>
           </div>
           <div class="file-upload-box">
@@ -803,7 +803,7 @@
             <div class="file-drop-area" onclick="document.getElementById('attach-files').click()">
               클릭하여 첨부 파일 선택 (여러 개 가능)
             </div>
-<input type="file" id="body-file-input" onchange="handleFileSelect(event, 'file-list')">
+<input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-list')">
             <ul class="file-list" id="attach-file-list"></ul>
           </div>
         </div>
