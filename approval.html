@@ -795,7 +795,7 @@
             <div class="file-drop-area" onclick="document.getElementById('body-files').click()">
               클릭하여 본문 파일 선택 (HWP, PDF 각 1부)
             </div>
-            <input type="file" id="body-files" style="display:none;" multiple onchange="handleFileSelect(event, 'body-file-list')">
+<input type="file" id="body-file-input" onchange="handleFileSelect(event, 'file-list')">
             <ul class="file-list" id="body-file-list"></ul>
           </div>
           <div class="file-upload-box">
@@ -803,7 +803,7 @@
             <div class="file-drop-area" onclick="document.getElementById('attach-files').click()">
               클릭하여 첨부 파일 선택 (여러 개 가능)
             </div>
-            <input type="file" id="attach-files" style="display:none;" multiple onchange="handleFileSelect(event, 'attach-file-list')">
+<input type="file" id="body-file-input" onchange="handleFileSelect(event, 'file-list')">
             <ul class="file-list" id="attach-file-list"></ul>
           </div>
         </div>
@@ -1211,32 +1211,48 @@ async function submitDraft() {
       return;
     }
 
-    // 📁 1. 첨부파일 업로드 처리
-    const fileInput = document.getElementById('body-file-input'); // HTML의 file input ID에 맞춰주세요
+    // 📁 1. 첨부파일 DOM 요소 가져오기 (본문파일 / 첨부파일 요소 체크)
+    // HTML 상의 실제 <input type="file"> id로 확인
+    const fileInput = document.getElementById('body-file-input') || 
+                      document.querySelector('input[type="file"]');
+    
     let fileUrl = null;
 
-    if (fileInput && fileInput.files.length > 0) {
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
-      // 파일명이 중복되지 않도록 타임스탬프 추가
-      const filePath = `documents/${Date.now()}_${file.name}`;
+      
+      // 파일명 한글/특수문자 깨짐 방지 및 중복 방지를 위한 안전한 파일명 생성
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+      const filePath = `documents/${fileName}`;
 
+      // Supabase Storage에 업로드
       const { data: storageData, error: storageError } = await supabaseClient
         .storage
-        .from('attachments') // 아까 만든 스토리지 버킷 이름
-        .upload(filePath, file);
+        .from('attachments') // Supabase Storage 버킷명
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (storageError) throw storageError;
+      if (storageError) {
+        console.error('Storage Upload Error:', storageError);
+        throw new Error('파일 업로드 실패: ' + storageError.message);
+      }
 
-      // 업로드된 파일의 공개 URL 가져오기
+      // 업로드 완료 후 Public URL 생성
       const { data: publicUrlData } = supabaseClient
         .storage
         .from('attachments')
         .getPublicUrl(filePath);
 
       fileUrl = publicUrlData.publicUrl;
+      console.log('생성된 File URL:', fileUrl); // 디버깅용 로그
+    } else {
+      console.log('선택된 파일이 없습니다.');
     }
 
-    // 📝 2. documents 테이블에 문서 저장 (file_url 포함)
+    // 📝 2. documents 테이블에 DB 저장
     const { data: docData, error: docError } = await supabaseClient
       .from('documents')
       .insert([
@@ -1245,7 +1261,7 @@ async function submitDraft() {
           drafter_id: currentUser.id,
           current_approver_id: nextApproverId,
           status: 'PENDING',
-          file_url: fileUrl // 파일 다운로드 링크 저장
+          file_url: fileUrl // NULL이 아니면 URL 문자열 입력됨
         }
       ])
       .select();
@@ -1254,7 +1270,7 @@ async function submitDraft() {
 
     const createdDocId = docData[0].id;
 
-    // 👥 3. approval_lines 테이블에 결재선 저장
+    // 👥 3. approval_lines 테이블 저장
     const approvalLines = targetItems.map((item, index) => ({
       doc_id: createdDocId,
       approver_id: item.getAttribute('data-id'),
@@ -1276,10 +1292,9 @@ async function submitDraft() {
 
   } catch (err) {
     console.error('Supabase Error:', err);
-    showAlert('저장 실패', '상신 중 오류가 발생했습니다: ' + err.message);
+    showAlert('저장 실패', err.message || '상신 중 오류가 발생했습니다.');
   }
 }
-
     /* 커스텀 모달 출력 함수 */
     function showAlert(title, message) {
       document.getElementById('alertTitle').innerText = title;
