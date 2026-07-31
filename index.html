@@ -360,11 +360,15 @@
     </div>
   </div>
 
-function handleLogout(e) {
-  if (e) e.preventDefault(); // 기본 링크 이동 동작 방지
-  sessionStorage.removeItem('currentUser');
-  location.replace('login.html');
-}
+<script>
+    function handleLogout(e) {
+      if (e) e.preventDefault(); 
+      sessionStorage.removeItem('currentUser');
+      location.replace('login.html');
+    }
+  </script>
+</body>
+</html>
 
   <header class="navbar">
     <div class="nav-container">
