@@ -36,7 +36,7 @@
       border: 1px solid #e2e8f0;
     }
 
-    /* 상단 헤더 영역 (교육부 로고) */
+    /* 상단 헤더 영역 (로고) */
     .login-header {
       padding: 24px 30px 18px;
       display: flex;
@@ -47,7 +47,7 @@
     }
 
     .login-header img {
-      height: 20px
+      height: 20px; /* 세미콜론 추가 */
     }
 
     .login-header span {
@@ -59,14 +59,6 @@
     /* 로그인 폼 영역 */
     .form-section {
       padding: 30px;
-    }
-
-    .form-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #1e293b;
-      margin-bottom: 20px;
-      text-align: center;
     }
 
     /* 입력 필드 */
@@ -129,9 +121,7 @@
     </div>
 
     <div class="form-section">
-      <div class="form-title"></div>
-
-      <form id="id-login-form" onsubmit="handleLogin(event)">
+      <form id="id-login-form" onsubmit="return handleLogin(event)">
         <div class="input-group">
           <input type="text" id="user-id" class="input-field" placeholder="아이디를 입력하세요" autocomplete="username" required>
           <input type="password" id="user-pw" class="input-field" placeholder="비밀번호를 입력하세요" autocomplete="current-password" required>
@@ -152,9 +142,8 @@
   
   const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-  /* 🔑 2. 로그인 처리 (새로고침 차단 반영) */
+  /* 🔑 2. 로그인 처리 */
   async function handleLogin(e) {
-    // 폼 제출에 의한 페이지 새로고침 방지
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -169,17 +158,15 @@
     }
 
     try {
+      // 1) Supabase users 테이블 조회 시도
       if (supabaseClient) {
-        // Supabase users 테이블 조회
         const { data: users, error } = await supabaseClient
           .from('users')
           .select('*')
           .eq('id', userId)
           .eq('password', password);
 
-        if (error) throw error;
-
-        if (users && users.length > 0) {
+        if (!error && users && users.length > 0) {
           const loggedUser = users[0];
           sessionStorage.setItem('currentUser', JSON.stringify({
             id: loggedUser.id,
@@ -193,13 +180,15 @@
         }
       }
 
-      // DB 미연동 시 테스트용 계정
-      if (userId === 'lim2 && password === '1234') {
+      // 2) DB 미연동/테스트용 계정 검증 (문법 오류 수정 완료)
+      if (userId === 'test' && password === '1234') {
         sessionStorage.setItem('currentUser', JSON.stringify({
-          id: 'lim.2', name: '김대표', dept: '대표실'
+          id: 'lim.2',
+          name: '김대표',
+          dept: '대표실'
         }));
-        alert('로그인 성공!');
-        location.href = 'approval.html';
+        location.href = 'index.html';
+        return false;
       } else {
         alert('아이디 또는 비밀번호가 일치하지 않습니다.');
       }
@@ -213,4 +202,4 @@
   }
 </script>
 </body>
-</html>	
+</html>
