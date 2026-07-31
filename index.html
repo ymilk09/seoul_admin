@@ -360,11 +360,36 @@
     </div>
   </div>
 
-<script>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>SEOUL MY SOUL</title>
+
+  <script>
+    (function checkAuth() {
+      const currentUser = sessionStorage.getItem('currentUser');
+      if (!currentUser) {
+        alert('로그인이 필요한 서비스입니다.');
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <ul class="util-bottom-links">
+    <li><a href="#" onclick="handleLogout(event)">로그아웃</a></li>
+  </ul>
+
+  <script>
     function handleLogout(e) {
-      if (e) e.preventDefault(); 
-      sessionStorage.removeItem('currentUser');
-      location.replace('login.html');
+      if (e) e.preventDefault();
+
+      if (confirm('정말 로그아웃하시겠습니까?')) {
+        sessionStorage.removeItem('currentUser');
+        location.replace('login.html');
+      }
     }
   </script>
 </body>
