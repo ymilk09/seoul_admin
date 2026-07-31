@@ -134,7 +134,7 @@
       ※ 승인된 사용자만 접근할 수 있습니다.
     </div>
   </div>
-
+  
 <script>
   /* 🔑 1. Supabase 설정 */
   const SUPABASE_URL = 'https://arwwkmoeypsuzayrgkjd.supabase.co';
@@ -174,17 +174,20 @@
             dept: loggedUser.dept
           }));
 
+          alert(`${loggedUser.name}님 환영합니다!`);
           location.href = 'index.html';
           return false;
         }
       }
-      // 2) DB 미연동/테스트용 계정 검증 (문법 오류 수정 완료)
-      if (userId === '' && password === '') {
+
+      // 2) DB 미연동/테스트용 계정 검증
+      if (userId === 'seoulmysoul' && password === '1234') {
         sessionStorage.setItem('currentUser', JSON.stringify({
-          id: '',
-          name: '',
-          dept: ''
+          id: 'seoulmysoul',
+          name: '서울특별시',
+          dept: '서울특별시'
         }));
+        alert('로그인 성공!');
         location.href = 'index.html';
         return false;
       } else {
