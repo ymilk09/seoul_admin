@@ -354,11 +354,17 @@
         </a>
       </div>
 
-      <ul class="util-bottom-links">
-        <li><a href="#">로그아웃</a></li>
-      </ul>
+  <ul class="util-bottom-links">
+    <li><a href="#" onclick="handleLogout(event)">로그아웃</a></li>
+  </ul>
     </div>
   </div>
+
+function handleLogout(e) {
+  if (e) e.preventDefault(); // 기본 링크 이동 동작 방지
+  sessionStorage.removeItem('currentUser');
+  location.replace('login.html');
+}
 
   <header class="navbar">
     <div class="nav-container">
