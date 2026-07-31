@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEOUL MY SOUL</title>
+  <title>문서관리시스템</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -103,7 +103,7 @@
       color: #2563eb;
     }
 
-    /* 3. 메인 네비게이션바 */
+    /* 3. 메인 네비게이션바 (기존 구조 100% 보존) */
     .navbar {
       background-color: #ffffff;
       border-top: 1px solid #f1f5f9;
@@ -161,7 +161,7 @@
       border-bottom: 1px solid #BFBFBF;
     }
 
-    /* 드롭다운 메가 패널 스타일 */
+    /* 드롭다운 메가 패널 스타일 (기존 구조 100% 보존) */
     .mega-dropdown {
       display: none;
       position: absolute;
@@ -406,7 +406,7 @@
       background: none;
     }
 
-    /* 결재선 설정 고급 모달 팝업 */
+    /* 결재선 설정 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -447,7 +447,6 @@
       height: 480px;
     }
 
-    /* 좌측 검색 영역 */
     .org-tree-panel {
       flex: 1;
       border: 1px solid #e2e8f0;
@@ -512,7 +511,6 @@
       margin-top: 30px;
     }
 
-    /* 중앙 추가 버튼군 */
     .action-btn-panel {
       display: flex;
       flex-direction: column;
@@ -537,7 +535,6 @@
       border-color: #94a3b8;
     }
 
-    /* 우측 선택된 결재선 목록 (드래그 앤 드롭 지원) */
     .line-target-panel {
       flex: 1.2;
       display: flex;
@@ -623,7 +620,6 @@
     .btn-modal-apply { background: #4f46e5; color: #fff; }
     .btn-modal-apply:hover { background: #4338ca; }
 
-    /* 커스텀 경고 모달 */
     .alert-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -684,6 +680,7 @@
             <div class="mega-dropdown-container">
               <ul class="mega-menu-list">
                 <li><a href="approval.html" style="color: #2563eb; font-weight: 700;">기안</a></li>
+                <li><a href="#">결재</a></li>
                 <li><a href="#">수신</a></li>
                 <li><a href="#">문서대장</a></li>
               </ul>
@@ -790,22 +787,25 @@
       <div class="form-group full-width">
         <label>파일 업로드 (다중 선택 가능)</label>
         <div class="file-dual-container">
+          
           <div class="file-upload-box">
             <h4>📄 본문 파일</h4>
-            <div class="file-drop-area" onclick="document.getElementById('body-files').click()">
+            <div class="file-drop-area" onclick="triggerFileInput('body-file-input')">
               클릭하여 본문 파일 선택 (HWP, PDF 각 1부)
             </div>
-<input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'file-list')">
+            <input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'body-file-list')">
             <ul class="file-list" id="body-file-list"></ul>
           </div>
+
           <div class="file-upload-box">
             <h4>📎 첨부 파일</h4>
-            <div class="file-drop-area" onclick="document.getElementById('attach-files').click()">
+            <div class="file-drop-area" onclick="triggerFileInput('attach-file-input')">
               클릭하여 첨부 파일 선택 (여러 개 가능)
             </div>
-<input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-list')">
+            <input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-file-list')">
             <ul class="file-list" id="attach-file-list"></ul>
           </div>
+
         </div>
       </div>
     </div>
@@ -865,7 +865,6 @@
   const SUPABASE_URL = 'https://arwwkmoeypsuzayrgkjd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyd3drbW9leXBzdXpheXJna2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMjIyMTAsImV4cCI6MjEwMDg5ODIxMH0.sbfZXyCgQJli_6hUGMv2xtNwCB5aEWjReMyrngFT-F4';
   
-  // Supabase 클라이언트 초기화
   const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
   /* 🔑 현재 세션/로그인 사용자 정보 */
@@ -877,10 +876,10 @@
 
   /* DOM 로드 시 실행 */
   document.addEventListener('DOMContentLoaded', () => {
-    // 1. 유틸리티 바 로그인 표시 및 기안부서 동기화
+    // 1. 우측 사용자 텍스트 삭제 (빈 문자열 처리)
     const userInfoText = document.getElementById('user-info-text');
     if (userInfoText) {
-      userInfoText.innerText = '👤 ' + currentUser.name + '(' + currentUser.id + ') | ' + currentUser.dept;
+      userInfoText.innerText = '';
     }
     
     const draftDeptInput = document.getElementById('draft-dept-input');
@@ -888,17 +887,21 @@
       draftDeptInput.value = currentUser.dept;
     }
 
-    // 2. 초기 기안자 결재선 세팅
     initDraftUser();
 
-    // 3. 네비게이션 드롭다운 이벤트 등록
+    // 2. 상단 메가 드롭다운 메뉴 토글 (기존 메가 패널 CSS)
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         const currentItem = this.parentElement;
+        
         document.querySelectorAll('.nav-item').forEach(item => {
-          if (item !== currentItem) item.classList.remove('active');
+          if (item !== currentItem) {
+            item.classList.remove('active');
+          }
         });
+        
         currentItem.classList.toggle('active');
       });
     });
@@ -909,15 +912,21 @@
       }
     });
 
-    // 4. 문서카드 옵션 추가
     initDocCards();
   });
+
+  /* 3. 파일 선택 창 트리거 */
+  function triggerFileInput(inputId) {
+    const fileInput = document.getElementById(inputId);
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
 
   /* 기안자 결재선 초기화 */
   function initDraftUser() {
     const userText = currentUser.name + '(' + currentUser.id + ') | ' + currentUser.dept;
     
-    // 메인 화면 반영
     const displayContainer = document.getElementById('display-approval-steps');
     if (displayContainer) {
       displayContainer.innerHTML = 
@@ -927,7 +936,6 @@
         '</div>';
     }
 
-    // 모달 화면 반영
     const targetList = document.getElementById('target-approval-list');
     if (targetList) {
       targetList.innerHTML = 
@@ -978,18 +986,20 @@
     if (customAlert) customAlert.style.display = 'none';
   }
 
-  /* 파일 선택 처리 함수 */
+  /* 파일 선택 처리 및 화면 표시 */
   function handleFileSelect(event, listId) {
     const files = event.target.files;
     const fileList = document.getElementById(listId);
     if (!fileList) return;
+
+    fileList.innerHTML = ''; 
 
     for (let i = 0; i < files.length; i++) {
       const li = document.createElement('li');
       li.className = 'file-item';
       
       const fileSize = (files[i].size / 1024).toFixed(1);
-      li.innerHTML = '📄 ' + files[i].name + ' (' + fileSize + ' KB) <button type="button" onclick="this.parentElement.remove()">✕</button>';
+      li.innerHTML = `<span>📄 ${files[i].name} (${fileSize} KB)</span> <button type="button" class="btn-remove-file" onclick="this.parentElement.remove()">✕</button>`;
       
       fileList.appendChild(li);
     }
@@ -1107,7 +1117,7 @@
     list.appendChild(item);
   }
 
-  /* 드래그 앤 드롭 이벤터 */
+  /* 드래그 앤 드롭 이벤트 */
   function addDragAndDropEvents(item) {
     const targetListBox = document.getElementById('target-approval-list');
     if (item.getAttribute('data-role') === '기안') return;
@@ -1187,159 +1197,106 @@
     closeApprovalModal();
   }
 
- /* 🚀 [상신] 기능 (파일 업로드 포함) */
-async function submitDraft() {
-  const titleInput = document.getElementById('draft-title');
-  const title = titleInput ? titleInput.value.trim() : '';
+  /* 🚀 [상신] 기능 (본문 파일 Storage 업로드 후 URL 저장) */
+  async function submitDraft() {
+    const titleInput = document.getElementById('draft-title');
+    const title = titleInput ? titleInput.value.trim() : '';
 
-  if (!title) {
-    showAlert('입력 오류', '문서 제목을 입력해 주세요.');
-    return;
-  }
-
-  const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
-  if (targetItems.length < 2) {
-    showAlert('결재선 오류', '기안자 외 최소 1명 이상의 결재자를 지정해 주세요.');
-    return;
-  }
-
-  const nextApproverId = targetItems[1].getAttribute('data-id');
-
-  try {
-    if (!supabaseClient) {
-      showAlert('오류', 'Supabase 클라이언트가 초기화되지 않았습니다.');
+    if (!title) {
+      showAlert('입력 오류', '문서 제목을 입력해 주세요.');
       return;
     }
 
-    // 📁 1. 첨부파일 DOM 요소 가져오기 (본문파일 / 첨부파일 요소 체크)
-    // HTML 상의 실제 <input type="file"> id로 확인
-    const fileInput = document.getElementById('body-file-input') || 
-                      document.querySelector('input[type="file"]');
-    
-    let fileUrl = null;
-
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      
-      // 파일명 한글/특수문자 깨짐 방지 및 중복 방지를 위한 안전한 파일명 생성
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-      const filePath = `documents/${fileName}`;
-
-      // Supabase Storage에 업로드
-      const { data: storageData, error: storageError } = await supabaseClient
-        .storage
-        .from('attachments') // Supabase Storage 버킷명
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (storageError) {
-        console.error('Storage Upload Error:', storageError);
-        throw new Error('파일 업로드 실패: ' + storageError.message);
-      }
-
-      // 업로드 완료 후 Public URL 생성
-      const { data: publicUrlData } = supabaseClient
-        .storage
-        .from('attachments')
-        .getPublicUrl(filePath);
-
-      fileUrl = publicUrlData.publicUrl;
-      console.log('생성된 File URL:', fileUrl); // 디버깅용 로그
-    } else {
-      console.log('선택된 파일이 없습니다.');
+    const targetItems = Array.from(document.querySelectorAll('#target-approval-list .target-item'));
+    if (targetItems.length < 2) {
+      showAlert('결재선 오류', '기안자 외 최소 1명 이상의 결재자를 지정해 주세요.');
+      return;
     }
 
-    // 📝 2. documents 테이블에 DB 저장
-    const { data: docData, error: docError } = await supabaseClient
-      .from('documents')
-      .insert([
-        {
-          title: title,
-          drafter_id: currentUser.id,
-          current_approver_id: nextApproverId,
-          status: 'PENDING',
-          file_url: fileUrl // NULL이 아니면 URL 문자열 입력됨
+    const nextApproverId = targetItems[1].getAttribute('data-id');
+
+    try {
+      if (!supabaseClient) {
+        showAlert('오류', 'Supabase 클라이언트가 초기화되지 않았습니다.');
+        return;
+      }
+
+      // 📁 1. 본문 파일 업로드 처리
+      const fileInput = document.getElementById('body-file-input');
+      let fileUrl = null;
+
+      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const filePath = `documents/${fileName}`;
+
+        const { data: storageData, error: storageError } = await supabaseClient
+          .storage
+          .from('attachments')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (storageError) {
+          console.error('Storage Upload Error:', storageError);
+          throw new Error('파일 업로드 실패: ' + storageError.message);
         }
-      ])
-      .select();
 
-    if (docError) throw docError;
+        const { data: publicUrlData } = supabaseClient
+          .storage
+          .from('attachments')
+          .getPublicUrl(filePath);
 
-    const createdDocId = docData[0].id;
+        fileUrl = publicUrlData.publicUrl;
+      }
 
-    // 👥 3. approval_lines 테이블 저장
-    const approvalLines = targetItems.map((item, index) => ({
-      doc_id: createdDocId,
-      approver_id: item.getAttribute('data-id'),
-      approver_name: item.getAttribute('data-name'),
-      step_order: index + 1,
-      status: index === 0 ? 'APPROVED' : 'WAIT'
-    }));
+      // 📝 2. documents 테이블에 DB 저장
+      const { data: docData, error: docError } = await supabaseClient
+        .from('documents')
+        .insert([
+          {
+            title: title,
+            drafter_id: currentUser.id,
+            current_approver_id: nextApproverId,
+            status: 'PENDING',
+            file_url: fileUrl
+          }
+        ])
+        .select();
 
-    const { error: lineError } = await supabaseClient
-      .from('approval_lines')
-      .insert(approvalLines);
+      if (docError) throw docError;
 
-    if (lineError) throw lineError;
+      const createdDocId = docData[0].id;
 
-    showAlert('상신 완료', '성공적으로 문서와 파일이 상신되었습니다!');
-    setTimeout(() => {
-      location.href = 'index.html';
-    }, 1500);
+      // 👥 3. approval_lines 테이블 저장
+      const approvalLines = targetItems.map((item, index) => ({
+        doc_id: createdDocId,
+        approver_id: item.getAttribute('data-id'),
+        approver_name: item.getAttribute('data-name'),
+        step_order: index + 1,
+        status: index === 0 ? 'APPROVED' : 'WAIT'
+      }));
 
-  } catch (err) {
-    console.error('Supabase Error:', err);
-    showAlert('저장 실패', err.message || '상신 중 오류가 발생했습니다.');
+      const { error: lineError } = await supabaseClient
+        .from('approval_lines')
+        .insert(approvalLines);
+
+      if (lineError) throw lineError;
+
+      showAlert('상신 완료', '성공적으로 문서와 파일이 상신되었습니다!');
+      setTimeout(() => {
+        location.href = 'index.html';
+      }, 1500);
+
+    } catch (err) {
+      console.error('Supabase Error:', err);
+      showAlert('저장 실패', err.message || '상신 중 오류가 발생했습니다.');
+    }
   }
-}
-    /* 커스텀 모달 출력 함수 */
-    function showAlert(title, message) {
-      document.getElementById('alertTitle').innerText = title;
-      document.getElementById('alertMessage').innerText = message;
-      document.getElementById('customAlert').style.display = 'flex';
-    }
-
-    function closeAlert() {
-      document.getElementById('customAlert').style.display = 'none';
-    }
-
-    /* 파일 선택 처리 및 개별 삭제 함수 */
-    function handleFileSelect(event, listId) {
-      const files = event.target.files;
-      const fileList = document.getElementById(listId);
-
-      for (let i = 0; i < files.length; i++) {
-        const li = document.createElement('li');
-        li.className = 'file-item';
-        li.innerHTML = `
-          <span>📄 ${files[i].name} (${(files[i].size / 1024).toFixed(1)} KB)</span>
-          <button class="btn-remove-file" onclick="this.parentElement.remove()">✕</button>
-        `;
-        fileList.appendChild(li);
-      }
-    }
-
-    /* 네비게이션 드롭다운 관리 */
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const currentItem = this.parentElement;
-        document.querySelectorAll('.nav-item').forEach(item => {
-          if (item !== currentItem) item.classList.remove('active');
-        });
-        currentItem.classList.toggle('active');
-      });
-    });
-
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.nav-item')) {
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      }
-    }); 
-  </script>
+</script>
 
 </body>
 </html>
