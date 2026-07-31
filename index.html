@@ -10,7 +10,7 @@
     const currentUser = sessionStorage.getItem('currentUser');
     if (!currentUser) {
       alert('로그인이 필요한 서비스입니다.');
-      location.replace('login.html'); // replace를 사용해야 뒤로가기로 다시 들어오는 것을 막습니다.
+      location.replace('login.html');
     }
   })();
   </script>
@@ -350,7 +350,7 @@
     <div class="header-middle-container">
       <div class="brand-logo">
         <a href="#">
-          <img src="home.png" alt="통영시 e-행정" onerror="this.style.display='none';">
+          <img src="home.png" alt="SEOUL MY SOUL" onerror="this.style.display='none';">
         </a>
       </div>
       
@@ -378,9 +378,6 @@
 </head>
 <body>
 
-  <ul class="util-bottom-links">
-    <li><a href="#" onclick="handleLogout(event)">로그아웃</a></li>
-  </ul>
 
   <script>
     function handleLogout(e) {
