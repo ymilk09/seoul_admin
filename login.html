@@ -180,19 +180,6 @@
         }
       }
 
-      // 2) DB 미연동/테스트용 계정 검증 (문법 오류 수정 완료)
-      if (userId === 'test' && password === '1234') {
-        sessionStorage.setItem('currentUser', JSON.stringify({
-          id: 'lim.2',
-          name: '김대표',
-          dept: '대표실'
-        }));
-        location.href = 'index.html';
-        return false;
-      } else {
-        alert('아이디 또는 비밀번호가 일치하지 않습니다.');
-      }
-
     } catch (err) {
       console.error('로그인 오류:', err);
       alert('로그인 처리 중 오류가 발생했습니다.');
