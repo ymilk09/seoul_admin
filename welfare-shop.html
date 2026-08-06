@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SEOUL MY SOUL</title>
   <link rel="icon" href="./favicon.ico" type="image/x-icon">  
-  
+    <script>
+  (function checkAuth() {
+    const currentUser = sessionStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert('로그인이 필요한 서비스입니다.');
+      location.replace('login.html'); // replace를 사용해야 뒤로가기로 다시 들어오는 것을 막습니다.
+    }
+  })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
