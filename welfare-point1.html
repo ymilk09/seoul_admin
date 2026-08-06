@@ -458,14 +458,16 @@
         <input type="date" id="endDate" class="form-control" value="2026-12-31">
       </div>
 
-      <div class="filter-group" style="margin-left: 20px;">
-        <label>구분</label>
-        <select id="typeFilter" class="form-control">
-          <option value="ALL">전체</option>
-          <option value="USE">사용</option>
-          <option value="GRANT">배정</option>
-        </select>
-      </div>
+<div class="filter-group" style="margin-left: 20px;">
+  <label>구분</label>
+  <select id="typeFilter" class="form-control">
+    <option value="ALL">전체</option>
+    <option value="GRANT">배정</option>
+    <option value="USE">사용</option>
+    <option value="CANCEL">취소</option>
+    <option value="REVOKE">회수</option>
+  </select>
+</div>
 
       <button class="btn-search" onclick="loadWelfareData()">조회</button>
     </div>
@@ -596,26 +598,33 @@
       const tbody = document.querySelector('.welfare-table tbody');
       tbody.innerHTML = '';
 
-      if (txData && txData.length > 0) {
-        txData.forEach(item => {
-          const tr = document.createElement('tr');
-          const dateStr = new Date(item.created_at).toLocaleDateString();
-          const isMinus = item.amount < 0;
-          const displayAmount = (isMinus ? '- ' : '+ ') + Math.abs(item.amount).toLocaleString() + ' p';
-          const typeName = item.type === 'USE' ? '사용' : (item.type === 'GRANT' ? '배정' : '취소');
+// 거래 내역 테이블 출력 처리 부분
+if (txData && txData.length > 0) {
+  txData.forEach(item => {
+    const tr = document.createElement('tr');
+    const dateStr = new Date(item.created_at).toLocaleDateString();
+    const isMinus = item.amount < 0;
+    const displayAmount = (isMinus ? '- ' : '+ ') + Math.abs(item.amount).toLocaleString() + ' p';
 
-          tr.innerHTML = `
-            <td>${dateStr}</td>
-            <td>${typeName}</td>
-            <td>${item.description || '-'}</td>
-            <td class="${isMinus ? 'val-minus' : 'val-plus'}">${displayAmount}</td>
-            <td>완료</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">조회 조건에 해당하는 내역이 없습니다.</td></tr>';
-      }
+    // 🔑 거래 유형(type)에 따른 명확한 구분 이름 설정
+    let typeName = '기타';
+    if (item.type === 'USE') typeName = '사용';
+    else if (item.type === 'GRANT') typeName = '배정';
+    else if (item.type === 'CANCEL') typeName = '취소';
+    else if (item.type === 'REVOKE') typeName = '회수';
+
+    tr.innerHTML = `
+      <td>${dateStr}</td>
+      <td>${typeName}</td>
+      <td>${item.description || '-'}</td>
+      <td class="${isMinus ? 'val-minus' : 'val-plus'}">${displayAmount}</td>
+      <td>완료</td>
+    `;
+    tbody.appendChild(tr);
+  });
+} else {
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">조회 조건에 해당하는 내역이 없습니다.</td></tr>';
+}
 
     } catch (err) {
       console.error('포인트 데이터 로드 실패:', err);
