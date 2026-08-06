@@ -511,10 +511,10 @@
   
   let supabaseClient = null;
 
-  // 🔑 로그인 세션에서 사용자 이메일(ID) 동적 추출
+  // 🔑 로그인 세션에서 사용자 이메일(ID) 동적 추출 함수
   function getCurrentUserId() {
     const sessionData = sessionStorage.getItem('currentUser');
-    if (!sessionData) return 'seoulmysoul'; 
+    if (!sessionData) return '';
 
     try {
       const parsed = JSON.parse(sessionData);
@@ -523,8 +523,6 @@
       return sessionData; 
     }
   }
-
-  const currentUserId = getCurrentUserId();
 
   document.addEventListener('DOMContentLoaded', () => {
     // Supabase 클라이언트 안전 초기화
@@ -553,11 +551,19 @@
       }
     });
 
-    // 초기 포인트 데이터 로드
+    // 초기 데이터 로드
     loadWelfareData();
   });
 
   async function loadWelfareData() {
+    // 💡 1. 동적으로 현재 사용자 ID 가져오기
+    const currentUserId = getCurrentUserId();
+
+    if (!currentUserId) {
+      console.warn('로그인된 사용자 정보가 없습니다.');
+      return;
+    }
+
     if (!supabaseClient) {
       if (window.supabase) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -567,12 +573,25 @@
       }
     }
 
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const typeFilter = document.getElementById('typeFilter').value;
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const typeFilterInput = document.getElementById('typeFilter');
+
+    const startDate = startDateInput ? startDateInput.value : '2000-01-01';
+    const endDate = endDateInput ? endDateInput.value : '2099-12-31';
+    const typeFilter = typeFilterInput ? typeFilterInput.value : 'ALL';
 
     try {
-      // 1. 거래 내역(point_transactions) 조회
+      // 💡 2. DB 실시간 잔액(point_balances) 직접 조회 (관리자 페이지와 동일)
+      const { data: balanceData } = await supabaseClient
+        .from('point_balances')
+        .select('current_balance')
+        .eq('user_id', currentUserId)
+        .maybeSingle();
+
+      const realTimeBalance = balanceData ? balanceData.current_balance : 0;
+
+      // 💡 3. 필터링된 거래 내역(point_transactions) 조회
       let query = supabaseClient
         .from('point_transactions')
         .select('*')
@@ -588,7 +607,7 @@
       const { data: txData, error: txError } = await query;
       if (txError) throw txError;
 
-      // 2. 카드 집계용 전체 거래 내역 조회 (필터 미적용)
+      // 💡 4. 카드 집계용 전체 거래 내역 조회
       const { data: allTx, error: allTxError } = await supabaseClient
         .from('point_transactions')
         .select('amount, type')
@@ -610,21 +629,20 @@
         });
       }
 
-      // 카드 계산 공식
       const netGranted = Math.max(0, totalGranted - totalRevoked);
       const netUsed = Math.max(0, totalUsed - totalCanceled);
-      const netRemaining = Math.max(0, netGranted - netUsed);
 
-      // 카드 UI 반영 (안전한 접근)
+      // 💡 5. 카드 UI 반영
       const elGranted = document.getElementById('grantedPointDisplay');
       const elUsed = document.getElementById('usedPointDisplay');
       const elRemain = document.getElementById('remainPointDisplay');
 
       if (elGranted) elGranted.innerText = netGranted.toLocaleString() + ' p';
       if (elUsed) elUsed.innerText = netUsed.toLocaleString() + ' p';
-      if (elRemain) elRemain.innerText = netRemaining.toLocaleString() + ' p';
+      // 잔여 포인트는 DB 실시간 잔액(point_balances) 값으로 표시
+      if (elRemain) elRemain.innerText = realTimeBalance.toLocaleString() + ' p';
 
-      // 3. 하단 거래 내역 테이블 렌더링
+      // 💡 6. 하단 거래 내역 테이블 렌더링
       const tbody = document.getElementById('txTableBody');
       if (tbody) {
         tbody.innerHTML = '';
