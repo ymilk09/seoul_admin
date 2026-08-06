@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEOUL MY SOUL</title>
+  <title>SEOUL MY SOUL - 포인트 관리자</title>
   <link rel="icon" href="./favicon.ico" type="image/x-icon">  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -288,6 +288,7 @@
 
     .form-group {
       margin-bottom: 15px;
+      position: relative; /* 드롭다운 위치 기준점 */
     }
 
     .form-group label {
@@ -305,6 +306,51 @@
       border-radius: 6px;
       font-size: 0.9rem;
       outline: none;
+    }
+
+    /* 🔍 연관 사용자 자동완성 드롭다운 스타일 */
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 1050;
+      display: none;
+      list-style: none;
+      margin-top: 4px;
+    }
+
+    .autocomplete-item {
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      color: #334155;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+      background-color: #f1f5f9;
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    .autocomplete-item .user-balance {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: normal;
     }
 
     .btn-group {
@@ -468,7 +514,9 @@
         
         <div class="form-group">
           <label>대상 사용자 ID (이메일)</label>
-          <input type="text" id="targetUserId" class="form-control" placeholder="seoul@korea.kr">
+          <input type="text" id="targetUserId" class="form-control" placeholder="seoul@korea.kr" autocomplete="off" oninput="handleUserSearch(this.value)">
+          <!-- 연관 사용자 자동완성 리스트 -->
+          <ul id="autocompleteList" class="autocomplete-list"></ul>
         </div>
 
         <div class="form-group">
@@ -542,9 +590,13 @@
       });
     });
 
+    // 외부 영역 클릭 시 네비게이션 및 자동완성 목록 닫기
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.nav-item')) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      }
+      if (!e.target.closest('#targetUserId') && !e.target.closest('#autocompleteList')) {
+        hideAutocomplete();
       }
     });
 
@@ -595,8 +647,59 @@
     }
   }
 
+  // 🔍 1. 연관 사용자 검색 및 자동완성 기능
+  async function handleUserSearch(keyword) {
+    const listEl = document.getElementById('autocompleteList');
+    const searchVal = keyword.trim();
+
+    if (!searchVal) {
+      hideAutocomplete();
+      return;
+    }
+
+    if (!supabaseClient) return;
+
+    // 입력한 검색어가 포함된 user_id 조회
+    const { data, error } = await supabaseClient
+      .from('point_balances')
+      .select('user_id, current_balance')
+      .ilike('user_id', `%${searchVal}%`)
+      .limit(5);
+
+    if (error || !data || data.length === 0) {
+      hideAutocomplete();
+      return;
+    }
+
+    listEl.innerHTML = '';
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'autocomplete-item';
+      li.innerHTML = `
+        <span>${item.user_id}</span>
+        <span class="user-balance">${item.current_balance.toLocaleString()} P</span>
+      `;
+      li.onclick = () => {
+        selectUser(item.user_id);
+        hideAutocomplete();
+      };
+      listEl.appendChild(li);
+    });
+
+    listEl.style.display = 'block';
+  }
+
+  function hideAutocomplete() {
+    const listEl = document.getElementById('autocompleteList');
+    if (listEl) {
+      listEl.style.display = 'none';
+      listEl.innerHTML = '';
+    }
+  }
+
   function selectUser(userId) {
     document.getElementById('targetUserId').value = userId;
+    hideAutocomplete();
   }
 
   // 포인트 지급
