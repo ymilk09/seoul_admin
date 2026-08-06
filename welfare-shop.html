@@ -669,7 +669,7 @@
   const products = [
     {
       id: 1,
-      tag: '경상북도 영천시 기부 >',
+      tag: '경상북도 영천시 기부',
       title: '[굽들농원] 영천명품 친환경 쌀 2kg/6kg/10kg',
       price: 10000,
       isNew: false,
@@ -677,20 +677,22 @@
     },
     {
       id: 2,
-      tag: '강원특별자치도 속초시 기부 >',
+      tag: '강원특별자치도 속초시 기부',
       title: '속초 물회 세트',
       price: 30000,
       isNew: true,
       image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80'
     },
-    {
-      id: 3,
-      tag: '강원특별자치도 홍천군 기부 >',
-      title: '[홍천축산농협] 고향사랑 꼬리반골',
-      price: 60000,
-      isNew: false,
-      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80'
-    }
+{
+    id: 3,
+    tag: '메타버스 통영 안내 >',
+    title: '통영 복지포인트 사용 안내 및 혜택 소개',
+    price: 0,
+    isNew: true,
+    isInfoOnly: true, // 👈 설명 팝업 전용 구분값
+    description: '본 서비스는 메타버스 통영 임직원을 위한 복지포인트 전용 안내 페이지입니다. 복지포인트는 매년 정기 지급되며, 상품 구매 및 지역 기부에 자유롭게 사용하실 수 있습니다.', // 팝업에 표시할 설명글
+    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80'
+  }
   ];
 
   let currentUserPoint = 0;
