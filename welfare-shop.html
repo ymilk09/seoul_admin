@@ -785,35 +785,70 @@
 
   // 결제 모달 열기
   function openCheckoutModal(product) {
-    selectedProduct = product;
-    const modal = document.getElementById('checkoutModal');
+  selectedProduct = product;
+  const modal = document.getElementById('checkoutModal');
 
-    document.getElementById('modalImg').src = product.image;
-    document.getElementById('modalTag').innerText = product.tag;
-    document.getElementById('modalTitle').innerText = product.title;
+  document.getElementById('modalImg').src = product.image;
+  document.getElementById('modalTag').innerText = product.tag;
+  document.getElementById('modalTitle').innerText = product.title;
+
+  const summaryBox = document.querySelector('.payment-summary');
+  const payBtn = document.getElementById('btnPayConfirm');
+
+  // 💡 1) 설명/안내 전용 상품인 경우
+  if (product.isInfoOnly) {
+    document.getElementById('modalPrice').innerText = '안내 상품';
+    
+    // 결제 요약 영역 대신 설명 텍스트 표시
+    summaryBox.innerHTML = `
+      <div style="font-size: 0.9rem; color: #334155; line-height: 1.6; white-space: pre-line;">
+        ${product.description}
+      </div>
+    `;
+
+    // 하단 버튼을 '확인' 버튼으로 변경
+    payBtn.innerText = '확인';
+    payBtn.style.backgroundColor = '#2563eb';
+    payBtn.disabled = false;
+    payBtn.onclick = closeModal; // 클릭 시 바로 팝업 닫기
+  } 
+  // 💡 2) 일반 포인트 결제 상품인 경우
+  else {
     document.getElementById('modalPrice').innerText = product.price.toLocaleString() + ' P';
 
     const remain = currentUserPoint - product.price;
 
-    document.getElementById('modalCurrentPoint').innerText = currentUserPoint.toLocaleString() + ' P';
-    document.getElementById('modalDeductPoint').innerText = '- ' + product.price.toLocaleString() + ' P';
-    document.getElementById('modalRemainPoint').innerText = remain.toLocaleString() + ' P';
+    // 결제 요약 영역 원복
+    summaryBox.innerHTML = `
+      <div class="summary-row">
+        <span>보유 포인트</span>
+        <span id="modalCurrentPoint">${currentUserPoint.toLocaleString()} P</span>
+      </div>
+      <div class="summary-row danger">
+        <span>차감 포인트</span>
+        <span id="modalDeductPoint">- ${product.price.toLocaleString()} P</span>
+      </div>
+      <div class="summary-row total">
+        <span>결제 후 잔여 포인트</span>
+        <span id="modalRemainPoint" style="color: ${remain < 0 ? '#ef4444' : '#0f172a'}">${remain.toLocaleString()} P</span>
+      </div>
+    `;
 
-    const payBtn = document.getElementById('btnPayConfirm');
+    payBtn.onclick = processPayment; // 결제 진행 함수 연동
+
     if (remain < 0) {
-      document.getElementById('modalRemainPoint').style.color = '#ef4444';
       payBtn.disabled = true;
       payBtn.innerText = '포인트 잔액 부족';
       payBtn.style.backgroundColor = '#cbd5e1';
     } else {
-      document.getElementById('modalRemainPoint').style.color = '#0f172a';
       payBtn.disabled = false;
       payBtn.innerText = '복지포인트로 결제하기';
       payBtn.style.backgroundColor = '#2563eb';
     }
-
-    modal.classList.add('active');
   }
+
+  modal.classList.add('active');
+}
 
   // 모달 닫기
   function closeModal() {
