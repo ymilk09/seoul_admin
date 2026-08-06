@@ -542,99 +542,96 @@
   });
 
   async function loadWelfareData() {
-    if (!supabaseClient) return;
+  if (!supabaseClient) return;
 
-    try {
-      // 1) 총 배정액 (point_grants)
-      const { data: grantData } = await supabaseClient
-        .from('point_grants')
-        .select('amount')
-        .eq('user_id', currentUserId);
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const typeFilter = document.getElementById('typeFilter').value;
 
-      const totalGranted = grantData ? grantData.reduce((acc, cur) => acc + cur.amount, 0) : 0;
+  try {
+    // 1. 거래 내역(point_transactions) 조회
+    let query = supabaseClient
+      .from('point_transactions')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .gte('created_at', startDate + 'T00:00:00')
+      .lte('created_at', endDate + 'T23:59:59')
+      .order('created_at', { ascending: false });
 
-      // 2) 현재 잔액 (point_balances)
-      const { data: balData } = await supabaseClient
-        .from('point_balances')
-        .select('current_balance')
-        .eq('user_id', currentUserId)
-        .maybeSingle();
-
-      const currentBal = balData ? balData.current_balance : 0;
-      const usedPoint = totalGranted - currentBal;
-
-      // 상단 카드 UI 갱신 (전체 요약 통계)
-      const cardValues = document.querySelectorAll('.summary-card .card-value');
-      if (cardValues.length >= 3) {
-        cardValues[0].innerText = totalGranted.toLocaleString() + ' p';
-        cardValues[1].innerText = usedPoint.toLocaleString() + ' p';
-        cardValues[2].innerText = currentBal.toLocaleString() + ' p';
-      }
-
-      // 3) 검색 필터 조건 값 읽기
-      const startDateVal = document.getElementById('startDate').value;
-      const endDateVal = document.getElementById('endDate').value;
-      const typeFilterVal = document.getElementById('typeFilter').value;
-
-      // 4) 거래 내역 테이블 동적 쿼리 생성
-      let query = supabaseClient
-        .from('point_transactions')
-        .select('*')
-        .eq('user_id', currentUserId);
-
-      // 조회기간 시작일 조건
-      if (startDateVal) {
-        query = query.gte('created_at', `${startDateVal}T00:00:00`);
-      }
-      // 조회기간 종료일 조건
-      if (endDateVal) {
-        query = query.lte('created_at', `${endDateVal}T23:59:59`);
-      }
-      // 구분 조건 (USE, GRANT)
-      if (typeFilterVal && typeFilterVal !== 'ALL') {
-        query = query.eq('type', typeFilterVal);
-      }
-
-      const { data: txData, error: txError } = await query.order('created_at', { ascending: false });
-
-      if (txError) throw txError;
-
-      // 5) 테이블 결과 출력
-      const tbody = document.querySelector('.welfare-table tbody');
-      tbody.innerHTML = '';
-
-// 거래 내역 테이블 출력 처리 부분
-if (txData && txData.length > 0) {
-  txData.forEach(item => {
-    const tr = document.createElement('tr');
-    const dateStr = new Date(item.created_at).toLocaleDateString();
-    const isMinus = item.amount < 0;
-    const displayAmount = (isMinus ? '- ' : '+ ') + Math.abs(item.amount).toLocaleString() + ' p';
-
-    // 🔑 DB의 type 값에 따른 한글명 매핑
-    let typeName = '기타';
-    if (item.type === 'USE') typeName = '사용';
-    else if (item.type === 'GRANT') typeName = '배정';
-    else if (item.type === 'CANCEL') typeName = '취소';
-    else if (item.type === 'REVOKE') typeName = '회수';
-
-    tr.innerHTML = `
-      <td>${dateStr}</td>
-      <td>${typeName}</td>
-      <td>${item.description || '-'}</td>
-      <td class="${isMinus ? 'val-minus' : 'val-plus'}">${displayAmount}</td>
-      <td>완료</td>
-    `;
-    tbody.appendChild(tr);
-  });
-} else {
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">조회 조건에 해당하는 내역이 없습니다.</td></tr>';
-}
-
-    } catch (err) {
-      console.error('포인트 데이터 로드 실패:', err);
+    if (typeFilter !== 'ALL') {
+      query = query.eq('type', typeFilter);
     }
+
+    const { data: txData, error: txError } = await query;
+    if (txError) throw txError;
+
+    // 2. 카드 집계용 전체 거래 내역 조회 (필터 미적용)
+    const { data: allTx } = await supabaseClient
+      .from('point_transactions')
+      .select('amount, type')
+      .eq('user_id', currentUserId);
+
+    let totalGranted = 0; // 배정
+    let totalRevoked = 0; // 회수
+    let totalUsed = 0;    // 순수 사용
+    let totalCanceled = 0;// 사용 취소
+
+    if (allTx) {
+      allTx.forEach(t => {
+        if (t.type === 'GRANT') totalGranted += t.amount;
+        else if (t.type === 'REVOKE') totalRevoked += Math.abs(t.amount);
+        else if (t.type === 'USE') totalUsed += Math.abs(t.amount);
+        else if (t.type === 'CANCEL') totalCanceled += t.amount;
+      });
+    }
+
+    // 🔑 새로운 방식의 카드 계산
+    // 배정받은 포인트 = 배정 총액 - 회수 총액
+    const netGranted = Math.max(0, totalGranted - totalRevoked);
+    // 사용 포인트 = 순수 사용액 - 사용 취소액
+    const netUsed = Math.max(0, totalUsed - totalCanceled);
+    // 잔여 포인트 = 최종 배정액 - 순수 사용액
+    const netRemaining = Math.max(0, netGranted - netUsed);
+
+    // 카드 화면 반영
+    document.getElementById('grantedPointDisplay').innerText = netGranted.toLocaleString() + ' p';
+    document.getElementById('usedPointDisplay').innerText = netUsed.toLocaleString() + ' p';
+    document.getElementById('remainPointDisplay').innerText = netRemaining.toLocaleString() + ' p';
+
+    // 3. 하단 거래 내역 테이블 렌더링
+    const tbody = document.getElementById('txTableBody');
+    tbody.innerHTML = '';
+
+    if (txData && txData.length > 0) {
+      txData.forEach(item => {
+        const tr = document.createElement('tr');
+        const dateStr = new Date(item.created_at).toLocaleDateString();
+        const isMinus = item.amount < 0;
+        const displayAmount = (isMinus ? '- ' : '+ ') + Math.abs(item.amount).toLocaleString() + ' p';
+
+        let typeName = '기타';
+        if (item.type === 'USE') typeName = '사용';
+        else if (item.type === 'GRANT') typeName = '배정';
+        else if (item.type === 'CANCEL') typeName = '취소';
+        else if (item.type === 'REVOKE') typeName = '회수';
+
+        tr.innerHTML = `
+          <td>${dateStr}</td>
+          <td>${typeName}</td>
+          <td>${item.description || '-'}</td>
+          <td class="${isMinus ? 'val-minus' : 'val-plus'}">${displayAmount}</td>
+          <td>완료</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">조회 조건에 해당하는 내역이 없습니다.</td></tr>';
+    }
+
+  } catch (err) {
+    console.error('데이터 조회 실패:', err);
   }
+}
 
   function handleLogout(e) {
     if (e) e.preventDefault();
