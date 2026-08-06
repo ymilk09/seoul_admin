@@ -468,7 +468,7 @@
     <option value="REVOKE">회수</option>
   </select>
 </div>
-
+      
       <button class="btn-search" onclick="loadWelfareData()">조회</button>
     </div>
 
@@ -606,7 +606,7 @@ if (txData && txData.length > 0) {
     const isMinus = item.amount < 0;
     const displayAmount = (isMinus ? '- ' : '+ ') + Math.abs(item.amount).toLocaleString() + ' p';
 
-    // 🔑 거래 유형(type)에 따른 명확한 구분 이름 설정
+    // 🔑 DB의 type 값에 따른 한글명 매핑
     let typeName = '기타';
     if (item.type === 'USE') typeName = '사용';
     else if (item.type === 'GRANT') typeName = '배정';
