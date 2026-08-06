@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEOUL MY SOUL - 포인트 관리자</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background-color: #f0f2f5; color: #333; }
+
+    .top-header { background-color: #F2F2F2; height: 30px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0; }
+    .top-header-container { max-width: 1280px; width: 100%; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 10px; }
+    .top-header-text { font-size: 0.7rem; font-weight: 500; }
+
+    .header-middle { background-color: #ffffff; padding: 22px 0; }
+    .header-middle-container { max-width: 1280px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+    .brand-logo img { height: 23px; }
+
+    .navbar { background-color: #ffffff; border-top: 1px solid #f1f5f9; border-bottom: 2px solid #BFBFBF; }
+    .nav-container { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 20px; height: 55px; }
+    .nav-menu { display: flex; list-style: none; gap: 15px; height: 100%; }
+    .nav-link { display: flex; align-items: center; padding: 0 20px; height: 100%; text-decoration: none; color: #4a5568; font-weight: 700; }
+
+    .admin-container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+    .page-title { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 20px; }
+
+    .admin-grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
+
+    .card { background: #fff; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .card-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9; }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; outline: none; }
+
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; color: #fff; }
+    .btn-grant { background-color: #2563eb; }
+    .btn-grant:hover { background-color: #1d4ed8; }
+    .btn-revoke { background-color: #ef4444; }
+    .btn-revoke:hover { background-color: #dc2626; }
+
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .admin-table th { background-color: #f8fafc; padding: 12px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    .admin-table td { padding: 12px; font-size: 0.9rem; color: #334155; border-bottom: 1px solid #f1f5f9; }
+    .badge-user { font-weight: 700; color: #2563eb; }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <div class="top-header-container">
+      <span class="top-header-text">메타버스 통영 복지포인트 시스템 [관리자 모드]</span>
+    </div>
+  </div>
+
+  <div class="header-middle">
+    <div class="header-middle-container">
+      <div class="brand-logo">
+        <a href="index.html"><img src="home.png" alt="홈" onerror="this.style.display='none';"></a>
+      </div>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li><a href="welfare-points.html" class="nav-link">포인트 조회</a></li>
+        <li><a href="welfare-shop.html" class="nav-link">상품 구매</a></li>
+        <li><a href="welfare-admin.html" class="nav-link" style="color:#2563eb;">포인트 관리자</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <h2 class="page-title">포인트 지급 및 회수 관리</h2>
+
+    <div class="admin-grid">
+      <!-- 1. 포인트 처리 폼 -->
+      <div class="card">
+        <div class="card-title">포인트 지급 / 회수</div>
+        
+        <div class="form-group">
+          <label>대상 사용자 ID (이메일)</label>
+          <input type="text" id="targetUserId" class="form-control" placeholder="예: seoulmysoul">
+        </div>
+
+        <div class="form-group">
+          <label>포인트 금액</label>
+          <input type="number" id="pointAmount" class="form-control" placeholder="예: 100000" step="10000">
+        </div>
+
+        <div class="form-group">
+          <label>만료일자 (지급시에만 적용)</label>
+          <input type="date" id="expireDate" class="form-control" value="2026-12-31">
+        </div>
+
+        <div class="form-group">
+          <label>처리 사유 / 내용</label>
+          <input type="text" id="reasonDesc" class="form-control" placeholder="예: 2026년 하반기 정기 지급">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-grant" onclick="handleGrant()">+ 지급하기</button>
+          <button class="btn btn-revoke" onclick="handleRevoke()">- 회수하기</button>
+        </div>
+      </div>
+
+      <!-- 2. 전체 사용자 포인트 현황 -->
+      <div class="card">
+        <div class="card-title">전체 사용자 잔액 현황</div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>사용자 ID</th>
+              <th>현재 잔액</th>
+              <th>최종 수정일</th>
+              <th>선택</th>
+            </tr>
+          </thead>
+          <tbody id="userPointTbody">
+            <!-- 동적 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+<script>
+  const SUPABASE_URL = 'https://arwwkmoeypsuzayrgkjd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyd3drbW9leXBzdXpheXJna2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMjIyMTAsImV4cCI6MjEwMDg5ODIxMH0.sbfZXyCgQJli_6hUGMv2xtNwCB5aEWjReMyrngFT-F4';
+  const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUserBalances();
+  });
+
+  // 전체 사용자 잔액 불러오기
+  async function loadUserBalances() {
+    if (!supabaseClient) return;
+
+    const { data, error } = await supabaseClient
+      .from('point_balances')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error('사용자 목록 로드 실패:', error);
+      return;
+    }
+
+    const tbody = document.getElementById('userPointTbody');
+    tbody.innerHTML = '';
+
+    if (data && data.length > 0) {
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        const updateDate = new Date(item.updated_at).toLocaleString();
+        tr.innerHTML = `
+          <td class="badge-user">${item.user_id}</td>
+          <td><strong>${item.current_balance.toLocaleString()} P</strong></td>
+          <td>${updateDate}</td>
+          <td>
+            <button style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer;" onclick="selectUser('${item.user_id}')">선택</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">등록된 사용자 데이터가 없습니다.</td></tr>';
+    }
+  }
+
+  function selectUser(userId) {
+    document.getElementById('targetUserId').value = userId;
+  }
+
+  // 포인트 지급 실행
+  async function handleGrant() {
+    const userId = document.getElementById('targetUserId').value.trim();
+    const amount = parseInt(document.getElementById('pointAmount').value);
+    const expireDate = document.getElementById('expireDate').value;
+    const desc = document.getElementById('reasonDesc').value.trim() || '관리자 정기/수시 지급';
+
+    if (!userId || !amount || amount <= 0 || !expireDate) {
+      alert('사용자 ID, 올바른 금액, 만료일자를 모두 입력해 주세요.');
+      return;
+    }
+
+    const { error } = await supabaseClient.rpc('grant_points', {
+      p_user_id: userId,
+      p_amount: amount,
+      p_expire_date: expireDate,
+      p_description: desc
+    });
+
+    if (error) {
+      alert('지급 실패: ' + error.message);
+    } else {
+      alert(`[${userId}] 님에게 ${amount.toLocaleString()} P 지급이 완료되었습니다.`);
+      clearInputs();
+      loadUserBalances();
+    }
+  }
+
+  // 포인트 회수 실행
+  async function handleRevoke() {
+    const userId = document.getElementById('targetUserId').value.trim();
+    const amount = parseInt(document.getElementById('pointAmount').value);
+    const desc = document.getElementById('reasonDesc').value.trim() || '관리자 강제 회수/차감';
+
+    if (!userId || !amount || amount <= 0) {
+      alert('사용자 ID와 회수할 금액을 올바르게 입력해 주세요.');
+      return;
+    }
+
+    if (!confirm(`정말로 [${userId}] 님의 포인트를 ${amount.toLocaleString()} P 회수하시겠습니까?`)) {
+      return;
+    }
+
+    const { error } = await supabaseClient.rpc('revoke_points', {
+      p_user_id: userId,
+      p_amount: amount,
+      p_description: desc
+    });
+
+    if (error) {
+      alert('회수 실패: ' + error.message);
+    } else {
+      alert(`[${userId}] 님의 포인트 ${amount.toLocaleString()} P 회수가 완료되었습니다.`);
+      clearInputs();
+      loadUserBalances();
+    }
+  }
+
+  function clearInputs() {
+    document.getElementById('pointAmount').value = '';
+    document.getElementById('reasonDesc').value = '';
+  }
+</script>
+
+</body>
+</html>
