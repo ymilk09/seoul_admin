@@ -425,7 +425,7 @@
         
         <div class="form-group">
           <label>대상 사용자 ID (이메일)</label>
-          <input type="text" id="targetUserId" class="form-control" placeholder="예: seoulmysoul">
+          <input type="text" id="targetUserId" class="form-control" placeholder="seoul@korea.kr">
         </div>
 
         <div class="form-group">
@@ -440,7 +440,7 @@
 
         <div class="form-group">
           <label>처리 사유 / 내용</label>
-          <input type="text" id="reasonDesc" class="form-control" placeholder="예: 2026년 하반기 정기 지급">
+          <input type="text" id="reasonDesc" class="form-control" placeholder="">
         </div>
 
         <div class="btn-group">
@@ -558,7 +558,7 @@
     const userId = document.getElementById('targetUserId').value.trim();
     const amount = parseInt(document.getElementById('pointAmount').value);
     const expireDate = document.getElementById('expireDate').value;
-    const desc = document.getElementById('reasonDesc').value.trim() || '관리자 정기/수시 지급';
+    const desc = document.getElementById('reasonDesc').value.trim() || '포인트 지급';
 
     if (!userId || !amount || amount <= 0 || !expireDate) {
       alert('사용자 ID, 올바른 금액, 만료일자를 모두 입력해 주세요.');
@@ -585,7 +585,7 @@
   async function handleRevoke() {
     const userId = document.getElementById('targetUserId').value.trim();
     const amount = parseInt(document.getElementById('pointAmount').value);
-    const desc = document.getElementById('reasonDesc').value.trim() || '관리자 강제 회수/차감';
+    const desc = document.getElementById('reasonDesc').value.trim() || '포인트 회수';
 
     if (!userId || !amount || amount <= 0) {
       alert('사용자 ID와 회수할 금액을 올바르게 입력해 주세요.');
