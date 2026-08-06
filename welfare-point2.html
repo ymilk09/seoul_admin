@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEOUL MY SOUL - 포인트 관리자</title>
+  <title>SEOUL MY SOUL</title>
   <link rel="icon" href="./favicon.ico" type="image/x-icon">  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -513,25 +513,25 @@
         <div class="card-title">포인트 지급 / 회수</div>
         
         <div class="form-group">
-          <label>대상 사용자 ID (이메일)</label>
+          <label>대상자 이메일</label>
           <input type="text" id="targetUserId" class="form-control" placeholder="seoul@korea.kr" autocomplete="off" oninput="handleUserSearch(this.value)">
           <!-- 연관 사용자 자동완성 리스트 -->
           <ul id="autocompleteList" class="autocomplete-list"></ul>
         </div>
 
         <div class="form-group">
-          <label>포인트 금액</label>
-          <input type="number" id="pointAmount" class="form-control" placeholder="예: 100000" step="1">
+          <label>포인트</label>
+          <input type="number" id="pointAmount" class="form-control" placeholder="" step="1">
         </div>
 
         <div class="form-group">
-          <label>만료일자 (지급시에만 적용)</label>
+          <label>만료일자(지급시에만 적용)</label>
           <input type="date" id="expireDate" class="form-control" value="2026-12-31">
         </div>
 
         <div class="form-group">
-          <label>처리 사유 / 내용</label>
-          <input type="text" id="reasonDesc" class="form-control" placeholder="예: 2026년 하반기 정기 지급">
+          <label>사유</label>
+          <input type="text" id="reasonDesc" class="form-control" placeholder="">
         </div>
 
         <div class="btn-group">
