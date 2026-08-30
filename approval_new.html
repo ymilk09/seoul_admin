@@ -740,12 +740,54 @@
   }
 
 function submitDraft() {
-  // 1. 기안 여부 확인
-  if (!confirm('기안하시겠습니까?')) {
-    return; // 취소를 누르면 실행을 중단합니다.
+  // 1. 필수 입력값 요소 수집
+  const title = document.getElementById('draft-title').value.trim();
+  const docCard = document.getElementById('doc-card-select').value;
+  const publicType = document.querySelector('input[name="public-type"]:checked').value;
+  const basisNumber = document.getElementById('basis-number').value.trim();
+  const receiverType = document.querySelector('input[name="receiver-type"]:checked').value;
+  const bodyFiles = document.getElementById('body-file-input').files;
+
+  // 2. 항목별 유효성 검증 (Validation)
+  if (!title) {
+    alert('제목을 입력해주세요.');
+    document.getElementById('draft-title').focus();
+    return;
   }
 
-  // 2. 확인 클릭 시 완료 처리
+  if (docCard === '선택하세요' || !docCard) {
+    alert('과제카드를 선택해주세요.');
+    document.getElementById('doc-card-select').focus();
+    return;
+  }
+
+  if ((publicType === '비공개' || publicType === '부분공개') && !basisNumber) {
+    alert('비공개 또는 부분공개 선택 시 근거(제 호) 숫자를 입력해주세요.');
+    document.getElementById('basis-number').focus();
+    return;
+  }
+
+  if (receiverType === 'external' && window.receiverData.length === 0) {
+    alert('외부공문 선택 시 수신자를 최소 1곳 이상 지정해야 합니다.');
+    return;
+  }
+
+  // 기안자를 제외한 결재/전결/협조자 존재 여부 검증
+  if (window.approvalLineData.length <= 1) {
+    alert('결재경로지정 버튼을 통해 결재선(결재자 또는 전결자)을 추가해주세요.');
+    return;
+  }
+
+  if (!bodyFiles || bodyFiles.length === 0) {
+    alert('본문 파일(HWP, PDF)을 등록해주세요.');
+    return;
+  }
+
+  // 3. 모든 검증 통과 후 기안 진행
+  if (!confirm('기안하시겠습니까?')) {
+    return;
+  }
+
   setTimeout(() => {
     alert('기안이 완료되었습니다.');
     if (window.opener && !window.opener.closed) {
