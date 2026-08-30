@@ -170,7 +170,7 @@
       color: #334155;
     }
 
-    /* 파일 업로드 (본문/첨부 분리) */
+    /* 파일 업로드 */
     .file-dual-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -244,7 +244,6 @@
     <h2 class="page-title">문서관리카드기안</h2>
     <div class="toolbar-btns">
       <button type="button" class="btn-tool" onclick="submitDraft()">결재올림</button>
-      <button type="button" class="btn-tool secondary" onclick="openApprovalWindow()">결재경로</button>
       <button type="button" class="btn-tool secondary">임시저장</button>
     </div>
   </div>
@@ -277,16 +276,14 @@
               <label><input type="radio" name="public-type" value="비공개" onchange="toggleBasisInput()"> 비공개</label>
               <label><input type="checkbox" id="list-public" checked> 목록공개(공개)</label>
 
-              <!-- 숫자만 입력 가능한 비공개 근거 입력 영역 -->
               <span class="basis-input-wrap" id="basis-input-wrap">
                 <span style="font-size: 0.82rem; color: #475569; font-weight: bold;">근거(제</span>
-                <input type="text" id="basis-number" pattern="[0-0]*" inputmode="numeric" placeholder="숫자" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" id="basis-number" pattern="[0-9]*" inputmode="numeric" placeholder="숫자" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 <span style="font-size: 0.82rem; color: #475569; font-weight: bold;">호)</span>
               </span>
             </div>
           </td>
         </tr>
-        <!-- 대국민공개여부 바로 아래 배치된 수신자 설정 -->
         <tr>
           <th>* 수신자</th>
           <td>
@@ -350,14 +347,12 @@
   </div>
 
 <script>
-  const currentUser = { id: 'teacher01', name: '홍길동', dept: '교사' };
+  const currentUser = { id: 'kmk01', name: '김민기', dept: '교사' };
   
-  // 기본 결재선 데이터
   window.approvalLineData = [
     { role: '기안', id: currentUser.id, name: currentUser.name, dept: currentUser.dept }
   ];
 
-  // 수신자 데이터
   window.receiverData = [];
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -375,7 +370,6 @@
     });
   }
 
-  // 비공개 / 부분공개 선택 시 숫자 전용 근거 입력창 토글
   function toggleBasisInput() {
     const selected = document.querySelector('input[name="public-type"]:checked').value;
     const wrap = document.getElementById('basis-input-wrap');
@@ -387,7 +381,6 @@
     }
   }
 
-  // 수신자 옵션 변경 시 버튼 토글
   function toggleReceiverBtn() {
     const type = document.querySelector('input[name="receiver-type"]:checked').value;
     const btn = document.getElementById('btn-receiver-setting');
@@ -402,7 +395,6 @@
     }
   }
 
-  // 결재선 테이블 렌더링
   function renderApprovalGrid() {
     const tbody = document.getElementById('display-approval-rows');
     tbody.innerHTML = '';
@@ -420,7 +412,6 @@
     });
   }
 
-  // 파일 조작
   function triggerFileInput(id) { document.getElementById(id).click(); }
 
   function handleFileSelect(e, listId) {
@@ -436,12 +427,9 @@
     }
   }
 
-  /* 새 창(팝업) 열기 구현 */
-
-  // 1. 결재선 설정 새 창
   function openApprovalWindow() {
-    const width = 750;
-    const height = 500;
+    const width = 760;
+    const height = 520;
     const left = (screen.width - width) / 2;
     const top = (screen.height - height) / 2;
 
@@ -454,38 +442,63 @@
         <meta charset="UTF-8">
         <title>결재선 설정</title>
         <style>
-          body { font-family: sans-serif; padding: 15px; background: #f8fafc; margin:0; }
-          .header { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: #1e293b; }
-          .container { display: flex; gap: 10px; height: 380px; }
-          .panel { flex: 1; border: 1px solid #cbd5e1; background: #fff; padding: 10px; border-radius: 4px; display: flex; flex-direction: column; }
-          .search-wrap { display: flex; gap: 4px; margin-bottom: 8px; }
-          .search-wrap input { flex: 1; padding: 4px; border: 1px solid #cbd5e1; }
-          .tree-list { flex: 1; overflow-y: auto; font-size: 0.85rem; }
-          .user-item { padding: 6px; cursor: pointer; border-radius: 4px; }
-          .user-item:hover { background: #f1f5f9; }
-          .user-item.selected { background: #eff6ff; font-weight: bold; color: #2563eb; }
-          .btns { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
-          .btns button { padding: 6px 12px; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; }
-          .footer { margin-top: 10px; text-align: right; }
-          .btn-apply { background: #2563eb; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; background: #f8fafc; color: #334155; }
+          .header { font-weight: 800; font-size: 1.15rem; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+          .container { display: flex; gap: 12px; height: 390px; }
+          .panel { flex: 1; border: 1px solid #cbd5e1; background: #ffffff; padding: 12px; border-radius: 6px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+          .panel-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+          
+          .search-wrap { display: flex; gap: 6px; margin-bottom: 10px; }
+          .search-wrap input { flex: 1; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+          .search-wrap input:focus { border-color: #2563eb; }
+          .search-wrap button { padding: 6px 12px; border: 1px solid #2563eb; background: #2563eb; color: #fff; font-weight: 600; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+          .search-wrap button:hover { background: #1d4ed8; }
+
+          .tree-list { flex: 1; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 4px; background: #fafafa; padding: 4px; }
+          
+          .user-item { padding: 8px 10px; cursor: pointer; border-radius: 4px; margin-bottom: 2px; font-size: 0.85rem; background: #fff; border: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s ease; }
+          .user-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+          .user-item.selected { background: #eff6ff; border-color: #93c5fd; font-weight: bold; color: #2563eb; }
+
+          .target-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 4px; font-size: 0.83rem; }
+          .target-item .role-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 0.75rem; margin-right: 6px; }
+          .badge-결재 { background: #dbeafe; color: #1e40af; }
+          .badge-전결 { background: #fef3c7; color: #92400e; }
+          .badge-협조 { background: #e0e7ff; color: #3730a3; }
+          .badge-기안 { background: #f1f5f9; color: #475569; }
+          .target-item .btn-del { color: #ef4444; cursor: pointer; font-weight: bold; padding: 0 4px; }
+
+          .btns { display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+          .btns button { padding: 7px 10px; cursor: pointer; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; font-weight: 700; border-radius: 4px; font-size: 0.8rem; transition: background 0.15s; }
+          .btns button:hover { background: #f1f5f9; border-color: #94a3b8; }
+          
+          .footer { margin-top: 12px; text-align: right; }
+          .btn-apply { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
+          .btn-apply:hover { background: #1d4ed8; }
         </style>
       </head>
       <body>
         <div class="header">결재경로 지정</div>
         <div class="container">
           <div class="panel">
+            <div class="panel-title">사용자 검색</div>
             <div class="search-wrap">
-              <input type="text" id="q" placeholder="이름/부서/ID 검색">
+              <input type="text" id="q" placeholder="이름/부서/ID 검색" onkeyup="if(event.keyCode===13) search()">
               <button onclick="search()">검색</button>
             </div>
             <div class="tree-list" id="res"></div>
           </div>
           <div class="btns">
             <button onclick="add('결재')">결재 &gt;</button>
+            <button onclick="add('전결')">전결 &gt;</button>
             <button onclick="add('협조')">협조 &gt;</button>
           </div>
           <div class="panel">
-            <div style="font-size:0.85rem; font-weight:bold; margin-bottom:6px;">설정된 결재선</div>
+            <div class="panel-title">
+              <span>설정된 결재선</span>
+              <span id="line-count" style="font-size:0.75rem; color:#64748b; font-weight:normal;"></span>
+            </div>
             <div class="tree-list" id="target"></div>
           </div>
         </div>
@@ -495,6 +508,7 @@
 
         <script>
           const users = [
+            { id: 'kmk01', name: '김민기', dept: '교사' },
             { id: 'user01', name: '김철수', dept: '교감' },
             { id: 'user02', name: '이영희', dept: '교장' },
             { id: 'user03', name: '박민수', dept: '행정실장' },
@@ -504,14 +518,25 @@
           let lines = [...window.opener.approvalLineData];
 
           function search() {
-            const q = document.getElementById('q').value.trim();
+            const q = document.getElementById('q').value.trim().toLowerCase();
             const res = document.getElementById('res');
             res.innerHTML = '';
-            if(!q) return;
-            users.filter(u => u.name.includes(q) || u.dept.includes(q) || u.id.includes(q)).forEach(u => {
+            
+            const filtered = q ? users.filter(u => 
+              u.name.toLowerCase().includes(q) || 
+              u.dept.toLowerCase().includes(q) || 
+              u.id.toLowerCase().includes(q)
+            ) : users;
+
+            if(filtered.length === 0) {
+              res.innerHTML = '<div style="color:#94a3b8; padding:8px; font-size:0.82rem; text-align:center;">검색 결과가 없습니다.</div>';
+              return;
+            }
+
+            filtered.forEach(u => {
               const d = document.createElement('div');
               d.className = 'user-item';
-              d.innerText = \`\${u.name} (\${u.dept})\`;
+              d.innerHTML = \`<span>\${u.name}</span> <span style="font-size:0.75rem; color:#64748b;">\${u.dept}</span>\`;
               d.onclick = () => {
                 document.querySelectorAll('.user-item').forEach(el=>el.classList.remove('selected'));
                 d.classList.add('selected');
@@ -523,29 +548,66 @@
 
           function add(role) {
             if(!selected) return alert('대상을 선택하세요.');
+            
+            const exists = lines.some(item => item.id === selected.id);
+            if(exists) {
+              return alert('이미 결재선에 포함되어 있는 사람입니다.');
+            }
+
+            // 결재 및 전결 상호 배제
+            if(role === '결재') {
+              lines = lines.filter(item => item.role !== '전결');
+            } else if(role === '전결') {
+              lines = lines.filter(item => item.role !== '결재');
+            }
+
             lines.push({ role, ...selected });
             render();
           }
 
           function render() {
             const t = document.getElementById('target');
+            const countEl = document.getElementById('line-count');
             t.innerHTML = '';
+            
             lines.forEach((item, i) => {
               const d = document.createElement('div');
-              d.style.cssText = 'display:flex; justify-size:space-between; padding:4px; border-bottom:1px solid #eee; font-size:0.82rem;';
-              d.innerHTML = \`<span>[\${item.role}] \${item.name}(\${item.dept})</span> \${i > 0 ? \`<b style="color:red;cursor:pointer" onclick="del(\${i})">✕</b>\` : ''}\`;
+              d.className = 'target-item';
+              d.innerHTML = \`
+                <div>
+                  <span class="role-badge badge-\${item.role}">\${item.role}</span>
+                  <span>\${item.name} (\${item.dept})</span>
+                </div>
+                \${i > 0 ? \`<span class="btn-del" onclick="del(\${i})">✕</span>\` : ''}
+              \`;
               t.appendChild(d);
             });
+
+            if(countEl) countEl.innerText = \`총 \${lines.length}명\`;
           }
 
-          function del(i) { lines.splice(i,1); render(); }
+          function del(i) { 
+            lines.splice(i,1); 
+            render(); 
+          }
 
           function apply() {
+            if(lines.length <= 1) {
+              return alert('기안자 외에 결재자 또는 전결자를 추가해주세요.');
+            }
+
+            // 수정된 검증 조건: 마지막 항목이 '결재' 또는 '전결'인지 확인
+            const lastItem = lines[lines.length - 1];
+            if(lastItem.role !== '결재' && lastItem.role !== '전결') {
+              return alert('결재선의 마지막 단계는 반드시 "결재" 또는 "전결"이어야 합니다.');
+            }
+
             window.opener.approvalLineData = lines;
             window.opener.renderApprovalGrid();
             window.close();
           }
 
+          search();
           render();
         <\/script>
       </body>
@@ -554,7 +616,6 @@
     popup.document.write(popupHTML);
   }
 
-  // 2. 수신자 설정 새 창
   function openReceiverWindow() {
     const width = 600;
     const height = 450;
@@ -591,7 +652,7 @@
         <div class="container">
           <div class="panel">
             <div class="search-wrap">
-              <input type="text" id="q" placeholder="기관명/부서명 검색">
+              <input type="text" id="q" placeholder="기관명/부서명 검색" onkeyup="if(event.keyCode===13) search()">
               <button onclick="search()">검색</button>
             </div>
             <div class="tree-list" id="res"></div>
@@ -618,11 +679,21 @@
           let receivers = [...window.opener.receiverData];
 
           function search() {
-            const q = document.getElementById('q').value.trim();
+            const q = document.getElementById('q').value.trim().toLowerCase();
             const res = document.getElementById('res');
             res.innerHTML = '';
-            if(!q) return;
-            orgs.filter(o => o.name.includes(q) || o.dept.includes(q)).forEach(o => {
+            
+            const filtered = q ? orgs.filter(o => 
+              o.name.toLowerCase().includes(q) || 
+              o.dept.toLowerCase().includes(q)
+            ) : orgs;
+
+            if(filtered.length === 0) {
+              res.innerHTML = '<div style="color:#94a3b8; padding:6px;">검색 결과가 없습니다.</div>';
+              return;
+            }
+
+            filtered.forEach(o => {
               const d = document.createElement('div');
               d.className = 'user-item';
               d.innerText = \`\${o.name} (\${o.dept})\`;
@@ -646,7 +717,7 @@
             t.innerHTML = '';
             receivers.forEach((item, i) => {
               const d = document.createElement('div');
-              d.style.cssText = 'display:flex; justify-content:space-between; padding:4px; border-bottom:1px solid #eee; font-size:0.82rem;';
+              d.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px; border-bottom:1px solid #eee; font-size:0.82rem;';
               d.innerHTML = \`<span>\${item.name}(\${item.dept})</span> <b style="color:red;cursor:pointer" onclick="del(\${i})">✕</b>\`;
               t.appendChild(d);
             });
@@ -661,6 +732,7 @@
             window.close();
           }
 
+          search();
           render();
         <\/script>
       </body>
@@ -670,7 +742,15 @@
   }
 
   function submitDraft() {
-    alert('결재 상신이 진행됩니다.');
+    setTimeout(() => {
+      alert('결재가 완료되었습니다.');
+      if (window.opener && !window.opener.closed) {
+        window.opener.location.reload();
+      } else {
+        window.location.reload();
+      }
+      window.close();
+    }, 500);
   }
 </script>
 
