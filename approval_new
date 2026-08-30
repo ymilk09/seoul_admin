@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문서관리카드기안</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #333;
+      padding: 15px;
+    }
+
+    /* 상단 액션 툴바 */
+    .toolbar-header {
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px 6px 0 0;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    .toolbar-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-tool {
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 4px;
+      border: 1px solid #94a3b8;
+      background: #2563eb;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    .btn-tool:hover { background: #1d4ed8; }
+
+    .btn-tool.secondary {
+      background: #ffffff;
+      color: #334155;
+      border-color: #cbd5e1;
+    }
+
+    .btn-tool.secondary:hover { background: #f1f5f9; }
+
+    /* 메인 폼 카드 */
+    .draft-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .section-head {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .form-table th {
+      width: 140px;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .form-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      background-color: #ffffff;
+      font-size: 0.88rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .form-control:focus { border-color: #2563eb; }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* 근거 입력창 (숫자만) */
+    .basis-input-wrap {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-left: 10px;
+    }
+
+    .basis-input-wrap input {
+      width: 80px;
+      padding: 4px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    /* 결재선 그리드 */
+    .line-grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .line-grid-table th {
+      background-color: #475569;
+      color: #ffffff;
+      border: 1px solid #334155;
+      padding: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .line-grid-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      font-size: 0.85rem;
+      color: #334155;
+    }
+
+    /* 파일 업로드 (본문/첨부 분리) */
+    .file-dual-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .file-upload-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 12px;
+      background-color: #f8fafc;
+    }
+
+    .file-upload-box h4 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .file-drop-area {
+      border: 2px dashed #cbd5e1;
+      background: #ffffff;
+      border-radius: 4px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 0.82rem;
+    }
+
+    .file-drop-area:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .file-list {
+      margin-top: 8px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .file-item .btn-remove {
+      color: #ef4444;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar-header">
+    <h2 class="page-title">문서관리카드기안</h2>
+    <div class="toolbar-btns">
+      <button type="button" class="btn-tool" onclick="submitDraft()">결재올림</button>
+      <button type="button" class="btn-tool secondary" onclick="openApprovalWindow()">결재경로</button>
+      <button type="button" class="btn-tool secondary">임시저장</button>
+    </div>
+  </div>
+
+  <div class="draft-card">
+    <div class="section-head">
+      <span>| 문서정보</span>
+    </div>
+    
+    <table class="form-table">
+      <tbody>
+        <tr>
+          <th>* 제목</th>
+          <td>
+            <input type="text" id="draft-title" class="form-control" placeholder="제목을 입력하세요.">
+          </td>
+        </tr>
+        <tr>
+          <th>* 과제카드</th>
+          <td>
+            <select id="doc-card-select" class="form-control"></select>
+          </td>
+        </tr>
+        <tr>
+          <th>* 대국민공개여부</th>
+          <td>
+            <div class="radio-group">
+              <label><input type="radio" name="public-type" value="공개" checked onchange="toggleBasisInput()"> 공개</label>
+              <label><input type="radio" name="public-type" value="부분공개" onchange="toggleBasisInput()"> 부분공개</label>
+              <label><input type="radio" name="public-type" value="비공개" onchange="toggleBasisInput()"> 비공개</label>
+              <label><input type="checkbox" id="list-public" checked> 목록공개(공개)</label>
+
+              <!-- 숫자만 입력 가능한 비공개 근거 입력 영역 -->
+              <span class="basis-input-wrap" id="basis-input-wrap">
+                <span style="font-size: 0.82rem; color: #475569; font-weight: bold;">근거(제</span>
+                <input type="text" id="basis-number" pattern="[0-0]*" inputmode="numeric" placeholder="숫자" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                <span style="font-size: 0.82rem; color: #475569; font-weight: bold;">호)</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <!-- 대국민공개여부 바로 아래 배치된 수신자 설정 -->
+        <tr>
+          <th>* 수신자</th>
+          <td>
+            <div class="radio-group">
+              <label><input type="radio" name="receiver-type" value="internal" checked onchange="toggleReceiverBtn()"> 내부결재</label>
+              <label><input type="radio" name="receiver-type" value="external" onchange="toggleReceiverBtn()"> 외부공문</label>
+              
+              <button type="button" id="btn-receiver-setting" class="btn-tool secondary" style="display:none; padding: 2px 8px; font-size: 0.78rem;" onclick="openReceiverWindow()">수신자 설정</button>
+              <span id="receiver-display-text" style="font-size: 0.82rem; color: #2563eb; font-weight: bold; margin-left: 5px;"></span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 결재선 현황 -->
+    <div class="section-head">
+      <span>| 결재경로</span>
+      <button type="button" class="btn-tool secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="openApprovalWindow()">결재경로지정</button>
+    </div>
+    
+    <table class="line-grid-table">
+      <thead>
+        <tr>
+          <th style="width: 8%;">순번</th>
+          <th style="width: 15%;">처리방법</th>
+          <th style="width: 20%;">직위(직급)</th>
+          <th>처리자</th>
+          <th style="width: 15%;">처리상태</th>
+        </tr>
+      </thead>
+      <tbody id="display-approval-rows">
+      </tbody>
+    </table>
+
+    <!-- 파일 업로드 영역 -->
+    <div class="section-head" style="margin-top: 15px;">
+      <span>| 파일 업로드</span>
+    </div>
+
+    <div class="file-dual-container">
+      <div class="file-upload-box">
+        <h4>📄 본문 파일 지정</h4>
+        <div class="file-drop-area" onclick="triggerFileInput('body-file-input')">
+          클릭하여 본문 파일 선택 (HWP, PDF)
+        </div>
+        <input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'body-file-list')">
+        <ul class="file-list" id="body-file-list"></ul>
+      </div>
+
+      <div class="file-upload-box">
+        <h4>📎 첨부 파일 지정</h4>
+        <div class="file-drop-area" onclick="triggerFileInput('attach-file-input')">
+          클릭하여 첨부 파일 선택 (다중 지원)
+        </div>
+        <input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-file-list')">
+        <ul class="file-list" id="attach-file-list"></ul>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  const currentUser = { id: 'teacher01', name: '홍길동', dept: '교사' };
+  
+  // 기본 결재선 데이터
+  window.approvalLineData = [
+    { role: '기안', id: currentUser.id, name: currentUser.name, dept: currentUser.dept }
+  ];
+
+  // 수신자 데이터
+  window.receiverData = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initDocCards();
+    renderApprovalGrid();
+  });
+
+  function initDocCards() {
+    const cards = ["선택하세요", "국가정책수립", "복무관리", "인사징계업무", "교육및연수", "일반행정업무"];
+    const select = document.getElementById('doc-card-select');
+    cards.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      select.appendChild(opt);
+    });
+  }
+
+  // 비공개 / 부분공개 선택 시 숫자 전용 근거 입력창 토글
+  function toggleBasisInput() {
+    const selected = document.querySelector('input[name="public-type"]:checked').value;
+    const wrap = document.getElementById('basis-input-wrap');
+    if (selected === '비공개' || selected === '부분공개') {
+      wrap.style.display = 'inline-flex';
+    } else {
+      wrap.style.display = 'none';
+      document.getElementById('basis-number').value = '';
+    }
+  }
+
+  // 수신자 옵션 변경 시 버튼 토글
+  function toggleReceiverBtn() {
+    const type = document.querySelector('input[name="receiver-type"]:checked').value;
+    const btn = document.getElementById('btn-receiver-setting');
+    const text = document.getElementById('receiver-display-text');
+
+    if (type === 'external') {
+      btn.style.display = 'inline-block';
+    } else {
+      btn.style.display = 'none';
+      window.receiverData = [];
+      text.innerText = '';
+    }
+  }
+
+  // 결재선 테이블 렌더링
+  function renderApprovalGrid() {
+    const tbody = document.getElementById('display-approval-rows');
+    tbody.innerHTML = '';
+
+    window.approvalLineData.forEach((item, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td>${item.role}</td>
+        <td>${item.dept}</td>
+        <td>${item.name}(${item.id})</td>
+        <td>${idx === 0 ? '기안 완료' : '대기'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // 파일 조작
+  function triggerFileInput(id) { document.getElementById(id).click(); }
+
+  function handleFileSelect(e, listId) {
+    const files = e.target.files;
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+
+    for (let f of files) {
+      const li = document.createElement('li');
+      li.className = 'file-item';
+      li.innerHTML = `<span>📄 ${f.name}</span> <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+      list.appendChild(li);
+    }
+  }
+
+  /* 새 창(팝업) 열기 구현 */
+
+  // 1. 결재선 설정 새 창
+  function openApprovalWindow() {
+    const width = 750;
+    const height = 500;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+
+    const popup = window.open('', 'ApprovalLinePopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes`);
+
+    const popupHTML = `
+      <!DOCTYPE html>
+      <html lang="ko">
+      <head>
+        <meta charset="UTF-8">
+        <title>결재선 설정</title>
+        <style>
+          body { font-family: sans-serif; padding: 15px; background: #f8fafc; margin:0; }
+          .header { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: #1e293b; }
+          .container { display: flex; gap: 10px; height: 380px; }
+          .panel { flex: 1; border: 1px solid #cbd5e1; background: #fff; padding: 10px; border-radius: 4px; display: flex; flex-direction: column; }
+          .search-wrap { display: flex; gap: 4px; margin-bottom: 8px; }
+          .search-wrap input { flex: 1; padding: 4px; border: 1px solid #cbd5e1; }
+          .tree-list { flex: 1; overflow-y: auto; font-size: 0.85rem; }
+          .user-item { padding: 6px; cursor: pointer; border-radius: 4px; }
+          .user-item:hover { background: #f1f5f9; }
+          .user-item.selected { background: #eff6ff; font-weight: bold; color: #2563eb; }
+          .btns { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+          .btns button { padding: 6px 12px; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; }
+          .footer { margin-top: 10px; text-align: right; }
+          .btn-apply { background: #2563eb; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        </style>
+      </head>
+      <body>
+        <div class="header">결재경로 지정</div>
+        <div class="container">
+          <div class="panel">
+            <div class="search-wrap">
+              <input type="text" id="q" placeholder="이름/부서/ID 검색">
+              <button onclick="search()">검색</button>
+            </div>
+            <div class="tree-list" id="res"></div>
+          </div>
+          <div class="btns">
+            <button onclick="add('결재')">결재 &gt;</button>
+            <button onclick="add('협조')">협조 &gt;</button>
+          </div>
+          <div class="panel">
+            <div style="font-size:0.85rem; font-weight:bold; margin-bottom:6px;">설정된 결재선</div>
+            <div class="tree-list" id="target"></div>
+          </div>
+        </div>
+        <div class="footer">
+          <button class="btn-apply" onclick="apply()">적용</button>
+        </div>
+
+        <script>
+          const users = [
+            { id: 'user01', name: '김철수', dept: '교감' },
+            { id: 'user02', name: '이영희', dept: '교장' },
+            { id: 'user03', name: '박민수', dept: '행정실장' },
+            { id: 'user04', name: '최지혜', dept: '교사' }
+          ];
+          let selected = null;
+          let lines = [...window.opener.approvalLineData];
+
+          function search() {
+            const q = document.getElementById('q').value.trim();
+            const res = document.getElementById('res');
+            res.innerHTML = '';
+            if(!q) return;
+            users.filter(u => u.name.includes(q) || u.dept.includes(q) || u.id.includes(q)).forEach(u => {
+              const d = document.createElement('div');
+              d.className = 'user-item';
+              d.innerText = \`\${u.name} (\${u.dept})\`;
+              d.onclick = () => {
+                document.querySelectorAll('.user-item').forEach(el=>el.classList.remove('selected'));
+                d.classList.add('selected');
+                selected = u;
+              };
+              res.appendChild(d);
+            });
+          }
+
+          function add(role) {
+            if(!selected) return alert('대상을 선택하세요.');
+            lines.push({ role, ...selected });
+            render();
+          }
+
+          function render() {
+            const t = document.getElementById('target');
+            t.innerHTML = '';
+            lines.forEach((item, i) => {
+              const d = document.createElement('div');
+              d.style.cssText = 'display:flex; justify-size:space-between; padding:4px; border-bottom:1px solid #eee; font-size:0.82rem;';
+              d.innerHTML = \`<span>[\${item.role}] \${item.name}(\${item.dept})</span> \${i > 0 ? \`<b style="color:red;cursor:pointer" onclick="del(\${i})">✕</b>\` : ''}\`;
+              t.appendChild(d);
+            });
+          }
+
+          function del(i) { lines.splice(i,1); render(); }
+
+          function apply() {
+            window.opener.approvalLineData = lines;
+            window.opener.renderApprovalGrid();
+            window.close();
+          }
+
+          render();
+        <\/script>
+      </body>
+      </html>
+    `;
+    popup.document.write(popupHTML);
+  }
+
+  // 2. 수신자 설정 새 창
+  function openReceiverWindow() {
+    const width = 600;
+    const height = 450;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+
+    const popup = window.open('', 'ReceiverPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes`);
+
+    const popupHTML = `
+      <!DOCTYPE html>
+      <html lang="ko">
+      <head>
+        <meta charset="UTF-8">
+        <title>수신자 설정</title>
+        <style>
+          body { font-family: sans-serif; padding: 15px; background: #f8fafc; margin:0; }
+          .header { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: #1e293b; }
+          .container { display: flex; gap: 10px; height: 320px; }
+          .panel { flex: 1; border: 1px solid #cbd5e1; background: #fff; padding: 10px; border-radius: 4px; display: flex; flex-direction: column; }
+          .search-wrap { display: flex; gap: 4px; margin-bottom: 8px; }
+          .search-wrap input { flex: 1; padding: 4px; border: 1px solid #cbd5e1; }
+          .tree-list { flex: 1; overflow-y: auto; font-size: 0.85rem; }
+          .user-item { padding: 6px; cursor: pointer; border-radius: 4px; }
+          .user-item:hover { background: #f1f5f9; }
+          .user-item.selected { background: #eff6ff; font-weight: bold; color: #2563eb; }
+          .btns { display: flex; flex-direction: column; justify-content: center; }
+          .btns button { padding: 6px 12px; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; }
+          .footer { margin-top: 10px; text-align: right; }
+          .btn-apply { background: #2563eb; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        </style>
+      </head>
+      <body>
+        <div class="header">수신 기관/자 지정</div>
+        <div class="container">
+          <div class="panel">
+            <div class="search-wrap">
+              <input type="text" id="q" placeholder="기관명/부서명 검색">
+              <button onclick="search()">검색</button>
+            </div>
+            <div class="tree-list" id="res"></div>
+          </div>
+          <div class="btns">
+            <button onclick="add()">추가 &gt;</button>
+          </div>
+          <div class="panel">
+            <div style="font-size:0.85rem; font-weight:bold; margin-bottom:6px;">선택된 수신자</div>
+            <div class="tree-list" id="target"></div>
+          </div>
+        </div>
+        <div class="footer">
+          <button class="btn-apply" onclick="apply()">적용</button>
+        </div>
+
+        <script>
+          const orgs = [
+            { id: 'org01', name: '서울특별시교육청', dept: '행정국' },
+            { id: 'org02', name: '통영시청', dept: '문화관광과' },
+            { id: 'org03', name: '경상남도교육청', dept: '초등교육과' }
+          ];
+          let selected = null;
+          let receivers = [...window.opener.receiverData];
+
+          function search() {
+            const q = document.getElementById('q').value.trim();
+            const res = document.getElementById('res');
+            res.innerHTML = '';
+            if(!q) return;
+            orgs.filter(o => o.name.includes(q) || o.dept.includes(q)).forEach(o => {
+              const d = document.createElement('div');
+              d.className = 'user-item';
+              d.innerText = \`\${o.name} (\${o.dept})\`;
+              d.onclick = () => {
+                document.querySelectorAll('.user-item').forEach(el=>el.classList.remove('selected'));
+                d.classList.add('selected');
+                selected = o;
+              };
+              res.appendChild(d);
+            });
+          }
+
+          function add() {
+            if(!selected) return alert('대상을 선택하세요.');
+            receivers.push(selected);
+            render();
+          }
+
+          function render() {
+            const t = document.getElementById('target');
+            t.innerHTML = '';
+            receivers.forEach((item, i) => {
+              const d = document.createElement('div');
+              d.style.cssText = 'display:flex; justify-content:space-between; padding:4px; border-bottom:1px solid #eee; font-size:0.82rem;';
+              d.innerHTML = \`<span>\${item.name}(\${item.dept})</span> <b style="color:red;cursor:pointer" onclick="del(\${i})">✕</b>\`;
+              t.appendChild(d);
+            });
+          }
+
+          function del(i) { receivers.splice(i,1); render(); }
+
+          function apply() {
+            window.opener.receiverData = receivers;
+            const text = window.opener.document.getElementById('receiver-display-text');
+            text.innerText = receivers.length > 0 ? \`(\${receivers.map(r=>r.name).join(', ')})\` : '';
+            window.close();
+          }
+
+          render();
+        <\/script>
+      </body>
+      </html>
+    `;
+    popup.document.write(popupHTML);
+  }
+
+  function submitDraft() {
+    alert('결재 상신이 진행됩니다.');
+  }
+</script>
+
+</body>
+</html>
