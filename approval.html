@@ -485,20 +485,19 @@
   </header>
 
   <!-- 4. 전자결재 홈 화면 (본문) -->
-  <div class="app-container">
-    <!-- 좌측 메뉴 사이드바 -->
-    <aside class="sidebar">
-      <button class="btn-draft" onclick="openNewDraftWindow()">기안작성 ✍</button>
-      <ul class="sidebar-list">
-        <li class="sidebar-item">기안함 <span>›</span></li>
-        <li class="sidebar-item">결재함 <span>›</span></li>
-        <li class="sidebar-item">수신함 <span>›</span></li>
-        <li class="sidebar-item">공람함</li>
-        <li class="sidebar-item">참조함</li>
-        <li class="sidebar-item">부서수신함</li>
-        <li class="sidebar-item">문서대장</li>
-      </ul>
-    </aside>
+<div class="app-container">
+  <!-- 좌측 메뉴 사이드바 -->
+  <aside class="sidebar">
+    <button class="btn-draft" onclick="openNewDraftWindow()">기안작성 ✍</button>
+    <ul class="sidebar-list">
+      <li class="sidebar-item" onclick="location.href='draft_box.html'">기안함 <span>›</span></li>
+      <li class="sidebar-item" onclick="location.href='approval.html'">결재함 <span>›</span></li>
+      <li class="sidebar-item" onclick="location.href='inbox.html'">수신함 <span>›</span></li>
+      <li class="sidebar-item" onclick="location.href='public_box.html'">공람함</li>
+      <li class="sidebar-item" onclick="location.href='dept_inbox.html'">부서수신함</li>
+      <li class="sidebar-item" onclick="location.href='document_ledger.html'">문서대장</li>
+    </ul>
+  </aside>
 
     <!-- 우측 메인 대시보드 -->
     <main class="main-content">
