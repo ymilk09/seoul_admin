@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEOUL MY SOUL - 전자결재 홈</title>
+  <title>SEOUL MY SOUL</title>
   <link rel="icon" href="./favicon.ico" type="image/x-icon">  
 
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -94,17 +95,17 @@
 
     .util-bottom-links a {
       text-decoration: none;
-      color: #1e293b;
+      color: #4a5568;
       display: flex;
       align-items: center;
       gap: 5px;
     }
 
     .util-bottom-links a:hover {
-      color: #2563eb;
+      color: #1e293b;
     }
 
-    /* 3. 메인 네비게이션바 (상단 메뉴 보존) */
+    /* 3. 메인 네비게이션바 */
     .navbar {
       background-color: #ffffff;
       border-top: 1px solid #f1f5f9;
@@ -204,7 +205,7 @@
     }
 
     .mega-menu-list a:hover {
-      color: #2563eb;
+      color: #1e293b;
       background-color: #f1f5f9;
     }
 
@@ -229,18 +230,20 @@
 
     .btn-draft {
       background: #ffffff;
-      border: 1px solid #2563eb;
-      color: #2563eb;
+      border: 1px solid #64748b;
+      color: #475569;
       font-weight: bold;
       padding: 10px;
       border-radius: 6px;
       cursor: pointer;
       text-align: center;
       margin-bottom: 15px;
+      transition: background 0.2s;
     }
 
     .btn-draft:hover {
-      background: #eff6ff;
+      background: #f1f5f9;
+      color: #1e293b;
     }
 
     .sidebar-list {
@@ -276,7 +279,7 @@
     .section-title {
       font-size: 1.1rem;
       font-weight: 700;
-      color: #1e293b;
+      color: #334155;
       margin-bottom: 12px;
     }
 
@@ -297,7 +300,7 @@
 
     .status-card .label {
       font-size: 0.85rem;
-      color: #2563eb;
+      color: #64748b;
       font-weight: 700;
       margin-bottom: 8px;
     }
@@ -305,7 +308,7 @@
     .status-card .count {
       font-size: 1.6rem;
       font-weight: 800;
-      color: #0f172a;
+      color: #334155;
     }
 
     /* 문서 목록 탭 및 테이블 */
@@ -326,15 +329,15 @@
     .tab-btn {
       padding-bottom: 10px;
       font-size: 0.9rem;
-      color: #64748b;
+      color: #94a3b8;
       font-weight: 700;
       cursor: pointer;
       border-bottom: 2px solid transparent;
     }
 
     .tab-btn.active {
-      color: #2563eb;
-      border-bottom-color: #2563eb;
+      color: #334155;
+      border-bottom-color: #475569;
     }
 
     .doc-table {
@@ -355,7 +358,7 @@
     .doc-table td {
       padding: 12px;
       border-bottom: 1px solid #f1f5f9;
-      color: #334155;
+      color: #475569;
     }
 
     .doc-table tr:hover {
@@ -364,19 +367,24 @@
 
     .doc-link {
       text-decoration: none;
-      color: #0f172a;
+      color: #334155;
       font-weight: 600;
     }
 
     .doc-link:hover {
       text-decoration: underline;
-      color: #2563eb;
+      color: #0f172a;
+    }
+
+    .status-text-gray {
+      color: #64748b;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. 최상단 안내 띠 (상단 메뉴 보존) -->
+  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -384,7 +392,7 @@
     </div>
   </div>
 
-  <!-- 2. 로고 및 유틸리티 영역 (상단 메뉴 보존) -->
+  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -400,7 +408,7 @@
     </div>
   </div>
 
-  <!-- 3. 메인 네비게이션바 (상단 메뉴 보존) -->
+  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -480,7 +488,7 @@
   <div class="app-container">
     <!-- 좌측 메뉴 사이드바 -->
     <aside class="sidebar">
-      <button class="btn-draft" onclick="location.href='approval.html'">기안작성 ✍</button>
+      <button class="btn-draft" onclick="openNewDraftWindow()">기안작성 ✍</button>
       <ul class="sidebar-list">
         <li class="sidebar-item">기안함 <span>›</span></li>
         <li class="sidebar-item">결재함 <span>›</span></li>
@@ -495,35 +503,35 @@
     <!-- 우측 메인 대시보드 -->
     <main class="main-content">
       
-      <!-- 나의 현황 섹션 -->
+      <!-- 나의 현황 -->
       <section>
         <h3 class="section-title">나의 현황</h3>
         <div class="status-grid">
           <div class="status-card">
             <div class="label">상신한</div>
-            <div class="count">+999</div>
+            <div class="count" id="cnt-submitted">0</div>
           </div>
           <div class="status-card">
             <div class="label">반려된</div>
-            <div class="count">24</div>
+            <div class="count" id="cnt-rejected">0</div>
           </div>
           <div class="status-card">
             <div class="label">결재전</div>
-            <div class="count">0</div>
+            <div class="count" id="cnt-pending">0</div>
           </div>
           <div class="status-card">
             <div class="label">수신 / 공람</div>
-            <div class="count">7 / 50</div>
+            <div class="count" id="cnt-received">0 / 0</div>
           </div>
         </div>
       </section>
 
-      <!-- 문서 목록 테이블 섹션 -->
+      <!-- 문서 목록 (상신함, 미결함, 수신함) -->
       <section class="content-box">
         <div class="tab-group">
-          <div class="tab-btn active">내가 상신한 문서</div>
-          <div class="tab-btn">내가 결재할 문서</div>
-          <div class="tab-btn">최근 결재 의견</div>
+          <div class="tab-btn active">상신함</div>
+          <div class="tab-btn">미결함</div>
+          <div class="tab-btn">수신함</div>
         </div>
 
         <table class="doc-table">
@@ -538,21 +546,21 @@
           </thead>
           <tbody>
             <tr>
-              <td><span style="color: #2563eb; font-weight: bold;">결재 대기</span></td>
+              <td><span class="status-text-gray">결재 대기</span></td>
               <td>기안지</td>
               <td><a href="#" class="doc-link">전사 카카오워크 도입의 건</a></td>
               <td>협조</td>
               <td>네오 | 인사팀</td>
             </tr>
             <tr>
-              <td><span style="color: #2563eb; font-weight: bold;">결재 대기</span></td>
+              <td><span class="status-text-gray">결재 대기</span></td>
               <td>지출결의</td>
               <td><a href="#" class="doc-link">하반기 이벤트 마케팅 비용 사용의 건</a></td>
               <td>부서협조</td>
               <td>튜브 | 마케팅팀</td>
             </tr>
             <tr>
-              <td><span style="color: #059669; font-weight: bold;">수신 대기</span></td>
+              <td><span class="status-text-gray">수신 대기</span></td>
               <td>지출결의</td>
               <td><a href="#" class="doc-link">기획팀 워크샵 비용 사용의 건</a></td>
               <td>결재</td>
@@ -561,11 +569,16 @@
           </tbody>
         </table>
       </section>
+
     </main>
   </div>
 
   <script>
-    // 네비게이션 드롭다운 제어 스크립트 (기존 유지)
+    function openNewDraftWindow() {
+      const url = 'approval.html';
+      window.open(url, '_blank', 'width=1000,height=800,scrollbars=yes');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
@@ -588,7 +601,43 @@
           document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         }
       });
+
+      fetchDashboardCounts();
     });
+
+    async function fetchDashboardCounts() {
+      try {
+        if (typeof supabase !== 'undefined') {
+          const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+          const userEmail = currentUser.email;
+
+          if (!userEmail) return;
+
+          const { count: submittedCount } = await supabase
+            .from('documents')
+            .select('*', { count: 'exact', head: true })
+            .eq('author_email', userEmail);
+
+          const { count: rejectedCount } = await supabase
+            .from('documents')
+            .select('*', { count: 'exact', head: true })
+            .eq('author_email', userEmail)
+            .eq('status', 'REJECTED');
+
+          const { count: pendingCount } = await supabase
+            .from('documents')
+            .select('*', { count: 'exact', head: true })
+            .eq('approver_email', userEmail)
+            .eq('status', 'PENDING');
+
+          if (submittedCount !== null) document.getElementById('cnt-submitted').innerText = submittedCount;
+          if (rejectedCount !== null) document.getElementById('cnt-rejected').innerText = rejectedCount;
+          if (pendingCount !== null) document.getElementById('cnt-pending').innerText = pendingCount;
+        }
+      } catch (err) {
+        console.log('카운트 불러오기 대기 중... (DB 수동 연동 필요)');
+      }
+    }
   </script>
 
 </body>
