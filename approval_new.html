@@ -328,7 +328,7 @@
         <div class="file-drop-area" onclick="triggerFileInput('body-file-input')">
           클릭하여 본문 파일 선택 (HWP, PDF)
         </div>
-        <input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'body-file-list')">
+        <input type="file" id="body-file-input" style="display: none;" onchange="handleFileSelect(event, 'body-file-list', 'body-file-input')">
         <ul class="file-list" id="body-file-list"></ul>
       </div>
 
@@ -337,7 +337,7 @@
         <div class="file-drop-area" onclick="triggerFileInput('attach-file-input')">
           클릭하여 첨부 파일 선택 (다중 지원)
         </div>
-        <input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-file-list')">
+        <input type="file" id="attach-file-input" style="display: none;" multiple onchange="handleFileSelect(event, 'attach-file-list', 'attach-file-input')">
         <ul class="file-list" id="attach-file-list"></ul>
       </div>
     </div>
@@ -412,7 +412,7 @@
 
   function triggerFileInput(id) { document.getElementById(id).click(); }
 
-  function handleFileSelect(e, listId) {
+  function handleFileSelect(e, listId, inputId) {
     const files = e.target.files;
     const list = document.getElementById(listId);
     list.innerHTML = '';
@@ -420,9 +420,16 @@
     for (let f of files) {
       const li = document.createElement('li');
       li.className = 'file-item';
-      li.innerHTML = `<span>📄 ${f.name}</span> <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+      li.innerHTML = `<span>📄 ${f.name}</span> <button type="button" class="btn-remove" onclick="removeFile('${inputId}', '${listId}')">✕</button>`;
       list.appendChild(li);
     }
+  }
+
+  function removeFile(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    input.value = ''; // input 파일 선택값 초기화
+    list.innerHTML = '';
   }
 
   function openApprovalWindow() {
@@ -552,7 +559,6 @@
               return alert('이미 결재선에 포함되어 있습니다.');
             }
 
-            // 결재 및 전결 상호 배제
             if(role === '결재') {
               lines = lines.filter(item => item.role !== '전결');
             } else if(role === '전결') {
@@ -594,7 +600,6 @@
               return alert('결재자 또는 전결자를 추가해 주세요.');
             }
 
-            // 수정된 검증 조건: 마지막 항목이 '결재' 또는 '전결'인지 확인
             const lastItem = lines[lines.length - 1];
             if(lastItem.role !== '결재' && lastItem.role !== '전결') {
               return alert('결재선의 마지막 단계는 반드시 "결재" 또는 "전결"이어야 합니다.');
@@ -739,65 +744,61 @@
     popup.document.write(popupHTML);
   }
 
-function submitDraft() {
-  // 1. 필수 입력값 요소 수집
-  const title = document.getElementById('draft-title').value.trim();
-  const docCard = document.getElementById('doc-card-select').value;
-  const publicType = document.querySelector('input[name="public-type"]:checked').value;
-  const basisNumber = document.getElementById('basis-number').value.trim();
-  const receiverType = document.querySelector('input[name="receiver-type"]:checked').value;
-  const bodyFiles = document.getElementById('body-file-input').files;
+  function submitDraft() {
+    const title = document.getElementById('draft-title').value.trim();
+    const docCard = document.getElementById('doc-card-select').value;
+    const publicType = document.querySelector('input[name="public-type"]:checked').value;
+    const basisNumber = document.getElementById('basis-number').value.trim();
+    const receiverType = document.querySelector('input[name="receiver-type"]:checked').value;
+    const bodyFiles = document.getElementById('body-file-input').files;
 
-  // 2. 항목별 유효성 검증 (Validation)
-  if (!title) {
-    alert('제목을 입력해주세요.');
-    document.getElementById('draft-title').focus();
-    return;
-  }
-
-  if (docCard === '선택하세요' || !docCard) {
-    alert('과제카드를 선택해주세요.');
-    document.getElementById('doc-card-select').focus();
-    return;
-  }
-
-  if ((publicType === '비공개' || publicType === '부분공개') && !basisNumber) {
-    alert('비공개 또는 부분공개 선택 시 근거(제 호) 숫자를 입력해주세요.');
-    document.getElementById('basis-number').focus();
-    return;
-  }
-
-  if (receiverType === 'external' && window.receiverData.length === 0) {
-    alert('외부공문 선택 시 수신자를 최소 1곳 이상 지정해야 합니다.');
-    return;
-  }
-
-  // 기안자를 제외한 결재/전결/협조자 존재 여부 검증
-  if (window.approvalLineData.length <= 1) {
-    alert('결재경로지정 버튼을 통해 결재선(결재자 또는 전결자)을 추가해주세요.');
-    return;
-  }
-
-  if (!bodyFiles || bodyFiles.length === 0) {
-    alert('본문 파일(HWP, PDF)을 등록해주세요.');
-    return;
-  }
-
-  // 3. 모든 검증 통과 후 기안 진행
-  if (!confirm('기안하시겠습니까?')) {
-    return;
-  }
-
-  setTimeout(() => {
-    alert('기안이 완료되었습니다.');
-    if (window.opener && !window.opener.closed) {
-      window.opener.location.reload();
-    } else {
-      window.location.reload();
+    if (!title) {
+      alert('제목을 입력해주세요.');
+      document.getElementById('draft-title').focus();
+      return;
     }
-    window.close();
-  }, 500);
-}
 
+    if (docCard === '선택하세요' || !docCard) {
+      alert('과제카드를 선택해주세요.');
+      document.getElementById('doc-card-select').focus();
+      return;
+    }
+
+    if ((publicType === '비공개' || publicType === '부분공개') && !basisNumber) {
+      alert('비공개 또는 부분공개 선택 시 근거(제 호) 숫자를 입력해주세요.');
+      document.getElementById('basis-number').focus();
+      return;
+    }
+
+    if (receiverType === 'external' && window.receiverData.length === 0) {
+      alert('외부공문 선택 시 수신자를 최소 1곳 이상 지정해야 합니다.');
+      return;
+    }
+
+    if (window.approvalLineData.length <= 1) {
+      alert('결재경로지정 버튼을 통해 결재선(결재자 또는 전결자)을 추가해주세요.');
+      return;
+    }
+
+    if (!bodyFiles || bodyFiles.length === 0) {
+      alert('본문 파일(HWP, PDF)을 등록해주세요.');
+      return;
+    }
+
+    if (!confirm('기안하시겠습니까?')) {
+      return;
+    }
+
+    setTimeout(() => {
+      alert('기안이 완료되었습니다.');
+      if (window.opener && !window.opener.closed) {
+        window.opener.location.reload();
+      } else {
+        window.location.reload();
+      }
+      window.close();
+    }, 500);
+  }
+</script>
 </body>
 </html>
