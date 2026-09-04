@@ -28,7 +28,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'SeoulHangangEB', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -235,7 +235,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* 상단 탭 메뉴 */
+    /* 상단 서브 메뉴 탭 (서울한강체 전용 적용 및 볼드감 완화) */
     .tab-menu {
       display: flex;
       gap: 30px;
@@ -246,8 +246,9 @@
     .tab-btn {
       background: none;
       border: none;
-      font-size: 1.15rem;
-      font-weight: 800;
+      font-family: 'SeoulHangangEB', sans-serif; /* 서브메뉴 전용 폰트 */
+      font-size: 1.1rem;
+      font-weight: normal; /* 너무 볼드하지 않게 설정 */
       color: #000000;
       padding-bottom: 10px;
       cursor: pointer;
@@ -294,7 +295,6 @@
       border-color: #5b73e8;
     }
 
-    /* 이미지 스타일 [조회], [저장] 버튼 */
     .btn-group {
       display: flex;
       align-items: center;
@@ -404,6 +404,11 @@
       outline: none;
     }
 
+    .input-allowance:disabled {
+      background-color: #f1f5f9;
+      color: #94a3b8;
+    }
+
     .input-allowance:focus {
       border-color: #5b73e8;
     }
@@ -423,7 +428,6 @@
 </head>
 <body>
 
-  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -431,7 +435,6 @@
     </div>
   </div>
 
-  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -445,7 +448,6 @@
     </div>
   </div>
 
-  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -521,21 +523,17 @@
     </div>
   </header>
 
-  <!-- 4. 메인 콘텐츠 영역 -->
   <main class="main-container">
-    <!-- 탭 헤더 -->
     <div class="tab-menu">
       <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 생성</button>
       <button class="tab-btn" onclick="switchTab('allowanceTab', this)">수당처리</button>
       <button class="tab-btn" onclick="switchTab('reductionTab', this)">감액처리</button>
     </div>
 
-    <!-- 탭 1: 대상자 생성 -->
     <div id="targetTab" class="tab-content active">
       <div class="top-bar">
         <div class="select-group">
           <select id="institutionSelect1" class="select-box">
-            <!-- 자바스크립트에서 옵션 생성 -->
           </select>
         </div>
         
@@ -573,12 +571,10 @@
       </div>
     </div>
 
-    <!-- 탭 2: 수당처리 (요구사항 반영) -->
     <div id="allowanceTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
           <select id="institutionSelect2" class="select-box">
-            <!-- 자바스크립트에서 옵션 생성 -->
           </select>
         </div>
         
@@ -598,19 +594,19 @@
               <th class="col-rank">직급</th>
               <th class="col-allowance">
                 <div>수당1</div>
-                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(1, this)" checked></div>
+                <div><input type="checkbox" id="masterAllowance1" class="checkbox-custom" onclick="toggleAllowanceColumn(1, this)"></div>
               </th>
               <th class="col-allowance">
                 <div>수당2</div>
-                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(2, this)" checked></div>
+                <div><input type="checkbox" id="masterAllowance2" class="checkbox-custom" onclick="toggleAllowanceColumn(2, this)"></div>
               </th>
               <th class="col-allowance">
                 <div>수당3</div>
-                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(3, this)" checked></div>
+                <div><input type="checkbox" id="masterAllowance3" class="checkbox-custom" onclick="toggleAllowanceColumn(3, this)"></div>
               </th>
               <th class="col-allowance">
                 <div>수당4</div>
-                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(4, this)" checked></div>
+                <div><input type="checkbox" id="masterAllowance4" class="checkbox-custom" onclick="toggleAllowanceColumn(4, this)"></div>
               </th>
             </tr>
           </thead>
@@ -625,7 +621,6 @@
       </div>
     </div>
 
-    <!-- 탭 3: 감액처리 -->
     <div id="reductionTab" class="tab-content">
       <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
         감액처리 기능 화면입니다.
@@ -634,6 +629,14 @@
   </main>
 
   <script>
+    // 수당별 고정 기본값 저장 객체 (단일 관리)
+    const defaultAllowanceValues = {
+      1: 100000,
+      2: 50000,
+      3: 30000,
+      4: 20000
+    };
+
     // 로그아웃
     function handleLogout(e) {
       if (e) e.preventDefault();
@@ -676,22 +679,20 @@
       "서울특별시소방재난본부"
     ];
 
-    // 기본 가상 데이터
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, allowance1: 100000, allowance2: 50000, allowance3: 30000, allowance4: 20000 },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, allowance1: 80000, allowance2: 40000, allowance3: 30000, allowance4: 10000 },
-        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, allowance1: 80000, allowance2: 40000, allowance3: 30000, allowance4: 10000 }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, allowance1: 120000, allowance2: 60000, allowance3: 50000, allowance4: 30000 }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, allowance1: 110000, allowance2: 55000, allowance3: 40000, allowance4: 25000 }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true }
       ]
     };
 
-    // 드롭다운 초기화
     function initDropdowns() {
       const selects = [document.getElementById("institutionSelect1"), document.getElementById("institutionSelect2")];
 
@@ -714,7 +715,6 @@
       });
     }
 
-    // 탭 전환
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -722,7 +722,6 @@
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
 
-      // 탭 전환 시 드롭다운 값 동기화
       const select1 = document.getElementById("institutionSelect1");
       const select2 = document.getElementById("institutionSelect2");
       if (tabId === 'allowanceTab' && select1.value) {
@@ -732,7 +731,7 @@
       }
     }
 
-    // 1. [대상자 생성] - 조회
+    // 1. [대상자 생성]
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
       if (!selectedInst) {
@@ -803,10 +802,10 @@
     }
 
     function handleSaveTarget() {
-      alert("대상자 설정이 저장되었습니다.");
+      alert("저장되었습니다.");
     }
 
-    // 2. [수당처리] - 조회 (대상자로 체크된 사람만 출력)
+    // 2. [수당처리]
     function handleSearchAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
       if (!selectedInst) {
@@ -815,8 +814,12 @@
       }
 
       const allData = mockTargetData[selectedInst] || [];
-      // 대상자로 체크(isTarget === true)된 사람만 필터링
       const filteredData = allData.filter(item => item.isTarget);
+
+      // 상단 마스터 체크박스 해제 초기화
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`masterAllowance${i}`).checked = false;
+      }
 
       renderAllowanceTable(filteredData);
       document.getElementById("btnSaveAllowance").disabled = false;
@@ -838,40 +841,60 @@
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
-          <td class="col-allowance">
-            <div class="allowance-input-group">
-              <input type="checkbox" class="checkbox-custom allow-cb-1" checked>
-              <input type="text" class="input-allowance" value="${item.allowance1.toLocaleString()}">
-            </div>
-          </td>
-          <td class="col-allowance">
-            <div class="allowance-input-group">
-              <input type="checkbox" class="checkbox-custom allow-cb-2" checked>
-              <input type="text" class="input-allowance" value="${item.allowance2.toLocaleString()}">
-            </div>
-          </td>
-          <td class="col-allowance">
-            <div class="allowance-input-group">
-              <input type="checkbox" class="checkbox-custom allow-cb-3" checked>
-              <input type="text" class="input-allowance" value="${item.allowance3.toLocaleString()}">
-            </div>
-          </td>
-          <td class="col-allowance">
-            <div class="allowance-input-group">
-              <input type="checkbox" class="checkbox-custom allow-cb-4" checked>
-              <input type="text" class="input-allowance" value="${item.allowance4.toLocaleString()}">
-            </div>
-          </td>
+          ${[1, 2, 3, 4].map(num => `
+            <td class="col-allowance">
+              <div class="allowance-input-group">
+                <input type="checkbox" class="checkbox-custom allow-cb-${num}" onchange="handleSingleAllowanceCheck(${num}, this)">
+                <input type="text" class="input-allowance allow-input-${num}" disabled value="" oninput="syncAllowanceValue(${num}, this.value)">
+              </div>
+            </td>
+          `).join('')}
         `;
         tbody.appendChild(row);
       });
     }
 
-    // 수당 컬럼 전체 체크/해제
+    // 개별 체크박스 변경 핸들러
+    function handleSingleAllowanceCheck(num, cb) {
+      const rowTd = cb.closest('td');
+      const input = rowTd.querySelector(`.allow-input-${num}`);
+      
+      if (cb.checked) {
+        input.disabled = false;
+        input.value = defaultAllowanceValues[num].toLocaleString();
+      } else {
+        input.disabled = true;
+        input.value = "";
+      }
+    }
+
+    // 헤더 전체 선택 핸들러 (전체 해제가 기본)
     function toggleAllowanceColumn(num, masterCb) {
       const targetCbs = document.querySelectorAll(`.allow-cb-${num}`);
-      targetCbs.forEach(cb => {
-        cb.checked = masterCb.checked;
+      const targetInputs = document.querySelectorAll(`.allow-input-${num}`);
+      
+      targetCbs.forEach(cb => cb.checked = masterCb.checked);
+      
+      targetInputs.forEach(input => {
+        input.disabled = !masterCb.checked;
+        input.value = masterCb.checked ? defaultAllowanceValues[num].toLocaleString() : "";
+      });
+    }
+
+    // 동일 수당 열의 모든 값 동기화 (고정 수당 금액 적용)
+    function syncAllowanceValue(num, value) {
+      // 숫자 변환 후 메모리 기본값 업데이트
+      const rawVal = Number(value.replace(/,/g, ''));
+      if (!isNaN(rawVal)) {
+        defaultAllowanceValues[num] = rawVal;
+      }
+
+      // 같은 열의 활성화된 모든 텍스트박스 동기화
+      const inputs = document.querySelectorAll(`.allow-input-${num}`);
+      inputs.forEach(input => {
+        if (!input.disabled) {
+          input.value = value;
+        }
       });
     }
 
