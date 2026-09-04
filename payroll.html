@@ -319,33 +319,53 @@
       cursor: not-allowed;
     }
 
+    /* 표 사이즈 고정 스타일 적용 */
     .table-wrapper {
+      width: 100%;
       overflow-x: auto;
       border-top: 2px solid #1e293b;
       border-bottom: 1px solid #1e293b;
+      background-color: #ffffff;
     }
 
     table {
       width: 100%;
+      min-width: 900px;
+      table-layout: fixed; /* 테이블 고정 layout */
       border-collapse: collapse;
       text-align: center;
       font-size: 0.9rem;
     }
 
     th, td {
-      padding: 10px 12px;
+      padding: 10px 8px;
       border: 1px solid #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     th {
       background-color: #f1f5f9;
       font-weight: 700;
       color: #1e293b;
+      height: 42px;
     }
 
-    .col-rank { width: 90px; }
-    .col-id { width: 110px; }
-    
+    td {
+      height: 45px;
+    }
+
+    /* 각 열 고정 너비 지정 */
+    .col-rank { width: 10%; }
+    .col-name { width: 14%; }
+    .col-id { width: 12%; }
+    .col-base { width: 13%; }
+    .col-allowance { width: 12%; }
+    .col-reduction { width: 11%; }
+    .col-deduction { width: 13%; }
+    .col-netpay { width: 15%; }
+
     .col-reduction-highlight {
       background-color: #fef2f2;
       color: #dc2626;
@@ -391,6 +411,7 @@
 </head>
 <body>
 
+  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -398,6 +419,7 @@
     </div>
   </div>
 
+  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -411,6 +433,7 @@
     </div>
   </div>
 
+  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -486,6 +509,7 @@
     </div>
   </header>
 
+  <!-- 4. 메인 콘텐츠 (급여대장) -->
   <main class="main-container">
     <div class="doc-title">
       <span>공무원 급여대장</span>
@@ -510,12 +534,12 @@
         <thead>
           <tr>
             <th class="col-rank">직급</th>
-            <th>성명(닉네임)</th>
+            <th class="col-name">성명(닉네임)</th>
             <th class="col-id">고유번호</th>
-            <th>기본급</th>
-            <th>수당</th>
-            <th>감액</th>
-            <th>공제</th>
+            <th class="col-base">기본급</th>
+            <th class="col-allowance">수당</th>
+            <th class="col-reduction">감액</th>
+            <th class="col-deduction">공제</th>
             <th class="col-netpay">실수령액</th>
           </tr>
         </thead>
@@ -650,12 +674,12 @@
 
         row.innerHTML = `
           <td class="col-rank">${person.rank}</td>
-          <td>${person.name}</td>
+          <td class="col-name">${person.name}</td>
           <td class="col-id">${person.id}</td>
-          <td class="text-right">${person.base}</td>
-          <td class="text-right">${person.allowance}</td>
-          <td class="${reductionClass}">${person.reduction}</td>
-          <td class="text-right">${person.deduction}</td>
+          <td class="col-base text-right">${person.base}</td>
+          <td class="col-allowance text-right">${person.allowance}</td>
+          <td class="col-reduction ${reductionClass}">${person.reduction}</td>
+          <td class="col-deduction text-right">${person.deduction}</td>
           <td class="col-netpay">${person.total}</td>
         `;
         tbody.appendChild(row);
