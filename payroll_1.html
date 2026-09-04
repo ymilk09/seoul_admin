@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SEOUL MY SOUL</title>
 
+  <!-- 서울한강체 웹폰트 불러오기 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Seoul+Hangang:wght@400;700&display=swap" rel="stylesheet">
+
   <script>
   (function checkAuth() {
     const currentUser = sessionStorage.getItem('currentUser');
@@ -23,7 +28,7 @@
     }
 
     body {
-      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      font-family: 'Seoul Hangang', 'Noto Sans KR', -apple-system, sans-serif;
       background-color: #f0f2f5;
       color: #333;
     }
@@ -216,7 +221,7 @@
       background-color: #f1f5f9;
     }
 
-    /* 4. 메인 콘텐츠 영역 (급여작업 메인) */
+    /* 4. 메인 콘텐츠 영역 (급여 작업 영역) */
     .main-container {
       max-width: 1280px;
       margin: 24px auto;
@@ -225,29 +230,27 @@
       border: 1px solid #cbd5e1;
       border-radius: 4px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      font-family: 'Seoul Hangang', sans-serif; /* 서울한강체 적용 */
     }
 
-    /* [신규 스타일] 상단 탭 메뉴 */
+    /* 상단 탭 메뉴 */
     .tab-menu {
       display: flex;
       gap: 30px;
       border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .tab-btn {
       background: none;
       border: none;
-      font-size: 1.2rem;
-      font-weight: 800;
+      font-family: 'Seoul Hangang', sans-serif;
+      font-size: 1.15rem; /* 글씨 크기 줄임 */
+      font-weight: 700;
       color: #000000;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       cursor: pointer;
       position: relative;
-    }
-
-    .tab-btn.active {
-      color: #000000;
     }
 
     .tab-btn.active::after {
@@ -260,12 +263,16 @@
       background-color: #5c7cfa;
     }
 
-    /* 상단 컨트롤 바 (기관 선택 + 버튼) */
+    /* 상단 컨트롤 바 (이전 급여대장 스타일 복구) */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      background-color: #f8fafc;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
     }
 
     .select-group {
@@ -275,40 +282,69 @@
     }
 
     .select-box {
-      padding: 8px 12px;
-      font-size: 0.95rem;
+      padding: 6px 10px;
+      font-size: 0.88rem; /* 글씨 크기 줄임 */
       border: 1px solid #cbd5e1;
       border-radius: 4px;
-      min-width: 250px;
+      min-width: 220px;
       outline: none;
       background-color: #fff;
+      font-family: 'Seoul Hangang', sans-serif;
     }
 
+    .select-box:focus {
+      border-color: #4c75f2;
+    }
+
+    /* [고정 버튼 스타일] 기존 급여대장의 버튼 디자인 적용 */
     .btn-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    /* 첨부 이미지 스타일 모방 버튼 */
-    .btn-action {
-      padding: 8px 22px;
-      font-size: 0.95rem;
+    .btn-search {
+      padding: 5px 12px;
+      font-size: 13px;
       font-weight: 700;
       color: #ffffff;
-      background-color: #5c7cfa;
+      background-color: #4c75f2;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(92, 124, 250, 0.3);
+      box-shadow: 0 1px 3px rgba(76, 117, 242, 0.2);
       transition: all 0.15s ease;
+      font-family: 'Seoul Hangang', sans-serif;
     }
 
-    .btn-action:hover {
-      background-color: #4c6ef5;
+    .btn-search:hover {
+      background-color: #3b62e0;
     }
 
-    /* 표 사이즈 및 스타일 설정 */
+    .btn {
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #64748b;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: 'Seoul Hangang', sans-serif;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: #475569;
+    }
+
+    .btn:disabled {
+      background-color: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    /* 표 사이즈 및 스타일 설정 (글꼴 정돈 및 사이즈 축소) */
     .table-wrapper {
       width: 100%;
       overflow-x: auto;
@@ -321,11 +357,11 @@
       table-layout: fixed;
       border-collapse: collapse;
       text-align: center;
-      font-size: 0.92rem;
+      font-size: 0.85rem; /* 기존 0.92rem에서 축소하여 정돈 */
     }
 
     th, td {
-      padding: 12px 8px;
+      padding: 8px 6px; /* 패딩 축소 */
       border: 1px solid #e2e8f0;
       white-space: nowrap;
       overflow: hidden;
@@ -333,24 +369,37 @@
     }
 
     th {
-      background-color: #f8fafc;
+      background-color: #f1f5f9;
       font-weight: 700;
       color: #1e293b;
+      height: 38px;
     }
 
-    /* 이미지 요구사항 비율 반영 */
+    td {
+      height: 40px;
+    }
+
+    /* 열 폭 지정 */
     .col-seq { width: 8%; }       /* 순번 (좁게) */
     .col-name { width: 18%; }     /* 성명 */
     .col-id { width: 22%; }       /* 고유번호 */
     .col-rank { width: 18%; }     /* 직급 */
     .col-date { width: 20%; }     /* 임용일 */
-    .col-target { width: 14%; }   /* 대상자 (체크여부, 좁게) */
+    .col-target { width: 14%; }   /* 대상자 */
 
     .checkbox-custom {
-      width: 17px;
-      height: 17px;
+      width: 15px;
+      height: 15px;
       cursor: pointer;
-      accent-color: #5c7cfa;
+      accent-color: #4c75f2;
+      vertical-align: middle;
+    }
+
+    .th-checkbox-label {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     tr:hover td {
@@ -468,7 +517,7 @@
 
   <!-- 4. 메인 콘텐츠 (급여 작업 영역) -->
   <main class="main-container">
-    <!-- 이미지 요청 탭 헤더 -->
+    <!-- 탭 헤더 -->
     <div class="tab-menu">
       <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 생성</button>
       <button class="tab-btn" onclick="switchTab('payrollTab', this)">급여처리</button>
@@ -483,9 +532,10 @@
           </select>
         </div>
         
+        <!-- 고정된 버튼 디자인 반영 -->
         <div class="btn-group">
-          <button class="btn-action" onclick="handleSearch()">조회</button>
-          <button class="btn-action" onclick="handleSave()">저장</button>
+          <button class="btn-search" onclick="handleSearch()">조회</button>
+          <button id="btnSave" class="btn" onclick="handleSave()" disabled>저장</button>
         </div>
       </div>
 
@@ -498,12 +548,18 @@
               <th class="col-id">고유번호</th>
               <th class="col-rank">직급</th>
               <th class="col-date">임용일</th>
-              <th class="col-target">대상자</th>
+              <th class="col-target">
+                <!-- 전체 선택/해제 체크박스 -->
+                <label class="th-checkbox-label">
+                  <input type="checkbox" id="selectAllCheckbox" class="checkbox-custom" onclick="toggleSelectAll(this)" checked>
+                  <span>대상자</span>
+                </label>
+              </th>
             </tr>
           </thead>
           <tbody id="targetTableBody">
             <tr>
-              <td colspan="6" style="padding: 35px 0; color: #94a3b8;">
+              <td colspan="6" style="padding: 30px 0; color: #94a3b8;">
                 기관을 선택한 후 [조회] 버튼을 눌러주세요.
               </td>
             </tr>
@@ -512,7 +568,7 @@
       </div>
     </div>
 
-    <!-- 탭 2: 급여처리 (추후 확장용 공간) -->
+    <!-- 탭 2: 급여처리 (추후 확장) -->
     <div id="payrollTab" class="tab-content">
       <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600;">
         급여처리 기능 화면 준비 중입니다.
@@ -569,14 +625,14 @@
 
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01" },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15" }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10" }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: false }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01" }
       ]
     };
 
@@ -619,13 +675,14 @@
       }
 
       const data = mockTargetData[selectedInst] || [
-        { seq: 1, name: "박지성", id: "2026999", rank: "주무관", date: "2023-05-01", isTarget: true }
+        { seq: 1, name: "박지성", id: "2026999", rank: "주무관", date: "2023-05-01" }
       ];
 
       renderTable(data);
+      document.getElementById("btnSave").disabled = false; // 저장 버튼 활성화
     }
 
-    // 데이터 랜더링
+    // 데이터 랜더링 (항상 모든 대상자 선택 상태 기본값)
     function renderTable(data) {
       const tbody = document.getElementById("targetTableBody");
       tbody.innerHTML = "";
@@ -635,9 +692,12 @@
         return;
       }
 
+      // 상단 전체 체크박스 초기화
+      const selectAllCb = document.getElementById("selectAllCheckbox");
+      if (selectAllCb) selectAllCb.checked = true;
+
       data.forEach(item => {
         const row = document.createElement("tr");
-        const isChecked = item.isTarget ? "checked" : "";
 
         row.innerHTML = `
           <td class="col-seq">${item.seq}</td>
@@ -646,21 +706,46 @@
           <td class="col-rank">${item.rank}</td>
           <td class="col-date">${item.date}</td>
           <td class="col-target">
-            <input type="checkbox" class="checkbox-custom" ${isChecked}>
+            <input type="checkbox" class="checkbox-custom row-checkbox" checked onchange="updateSelectAllStatus()">
           </td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // 저장 처리
+    // 전체 선택/해제 토글 기능
+    function toggleSelectAll(selectAllCb) {
+      const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+      rowCheckboxes.forEach(cb => {
+        cb.checked = selectAllCb.checked;
+      });
+    }
+
+    // 개별 체크 해제 시 전체 선택 체크박스 상태 연동
+    function updateSelectAllStatus() {
+      const selectAllCb = document.getElementById("selectAllCheckbox");
+      const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+      const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+
+      if (rowCheckboxes.length > 0 && rowCheckboxes.length === checkedBoxes.length) {
+        selectAllCb.checked = true;
+      } else {
+        selectAllCb.checked = false;
+      }
+    }
+
+    // 저장 처리 (확인 팝업 후 저장 메시지)
     function handleSave() {
       const selectedInst = document.getElementById("institutionSelect").value;
       if (!selectedInst) {
         alert("기관을 선택해 주세요.");
         return;
       }
-      alert("대상자 정보가 성공적으로 저장되었습니다.");
+
+      const confirmResult = confirm("대상자 정보를 저장하시겠습니까?");
+      if (confirmResult) {
+        alert("대상자 정보가 성공적으로 저장되었습니다.");
+      }
     }
 
     window.onload = function() {
