@@ -16,14 +16,6 @@
   </script>
 
   <style>
-    /* 1. 서울한강체 EB (로컬 폰트) 정의 */
-    @font-face {
-      font-family: 'MySeoulHangang';
-      src: url('./fonts/SeoulHangangEB.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -36,7 +28,7 @@
       color: #333;
     }
 
-    /* 1. 최상단 안내 띠 (원래 글꼴) */
+    /* 1. 최상단 안내 띠 */
     .top-header {
       background-color: #F2F2F2;
       color: #000000;
@@ -68,7 +60,7 @@
       letter-spacing: -0.3px;
     }
 
-    /* 2. 로고 및 유틸리티 영역 (원래 글꼴) */
+    /* 2. 로고 및 유틸리티 영역 */
     .header-middle {
       background-color: #ffffff;
       padding: 22px 0;
@@ -119,7 +111,7 @@
       color: #2563eb;
     }
 
-    /* 3. 메인 네비게이션바 (원래 글꼴) */
+    /* 3. 메인 네비게이션바 */
     .navbar {
       background-color: #ffffff;
       border-top: 1px solid #f1f5f9;
@@ -224,12 +216,7 @@
       background-color: #f1f5f9;
     }
 
-    /* 4. 메인 콘텐츠 영역 (서울한강체 적용) */
-    .main-container,
-    .main-container * {
-      font-family: 'MySeoulHangang', sans-serif !important;
-    }
-
+    /* 4. 메인 콘텐츠 영역 */
     .main-container {
       max-width: 1280px;
       margin: 24px auto;
@@ -251,7 +238,7 @@
     .tab-btn {
       background: none;
       border: none;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: #000000;
       padding-bottom: 8px;
@@ -269,14 +256,14 @@
       background-color: #5c7cfa;
     }
 
-    /* 상단 컨트롤 바 */
+    /* 상단 컨트롤 바 (폰트 축소 적용) */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
       background-color: #f8fafc;
-      padding: 12px 16px;
+      padding: 10px 14px;
       border: 1px solid #e2e8f0;
       border-radius: 4px;
     }
@@ -288,11 +275,11 @@
     }
 
     .select-box {
-      padding: 6px 10px;
-      font-size: 0.88rem;
+      padding: 5px 8px;
+      font-size: 0.8rem; /* 글꼴 축소 */
       border: 1px solid #cbd5e1;
       border-radius: 4px;
-      min-width: 220px;
+      min-width: 200px;
       outline: none;
       background-color: #fff;
     }
@@ -301,7 +288,7 @@
       border-color: #4c75f2;
     }
 
-    /* 고정 버튼 스타일 */
+    /* 버튼 스타일 (폰트 축소 적용) */
     .btn-group {
       display: flex;
       align-items: center;
@@ -309,8 +296,8 @@
     }
 
     .btn-search {
-      padding: 5px 12px;
-      font-size: 13px;
+      padding: 4px 10px;
+      font-size: 12px; /* 글꼴 축소 */
       font-weight: 700;
       color: #ffffff;
       background-color: #4c75f2;
@@ -326,8 +313,8 @@
     }
 
     .btn {
-      padding: 5px 12px;
-      font-size: 13px;
+      padding: 4px 10px;
+      font-size: 12px; /* 글꼴 축소 */
       font-weight: 700;
       color: #ffffff;
       background-color: #64748b;
@@ -347,7 +334,7 @@
       cursor: not-allowed;
     }
 
-    /* 표 사이즈 및 스타일 설정 */
+    /* 표 사이즈 및 스타일 설정 (대상자 영역 폰트 축소 적용) */
     .table-wrapper {
       width: 100%;
       overflow-x: auto;
@@ -360,11 +347,11 @@
       table-layout: fixed;
       border-collapse: collapse;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.75rem; /* 표 전체 글꼴 크기 축소 */
     }
 
     th, td {
-      padding: 8px 6px;
+      padding: 6px 4px;
       border: 1px solid #e2e8f0;
       white-space: nowrap;
       overflow: hidden;
@@ -375,11 +362,11 @@
       background-color: #f1f5f9;
       font-weight: 700;
       color: #1e293b;
-      height: 38px;
+      height: 32px; /* 헤더 높이 조절 */
     }
 
     td {
-      height: 40px;
+      height: 34px; /* 셀 높이 조절 */
     }
 
     /* 열 폭 지정 */
@@ -391,8 +378,8 @@
     .col-target { width: 14%; }   /* 대상자 */
 
     .checkbox-custom {
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
       cursor: pointer;
       accent-color: #4c75f2;
       vertical-align: middle;
@@ -403,6 +390,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      font-size: 0.75rem; /* 체크박스 라벨 글꼴 축소 */
     }
 
     tr:hover td {
@@ -535,7 +523,6 @@
           </select>
         </div>
         
-        <!-- 고정된 버튼 디자인 반영 -->
         <div class="btn-group">
           <button class="btn-search" onclick="handleSearch()">조회</button>
           <button id="btnSave" class="btn" onclick="handleSave()" disabled>저장</button>
@@ -562,7 +549,7 @@
           </thead>
           <tbody id="targetTableBody">
             <tr>
-              <td colspan="6" style="padding: 30px 0; color: #94a3b8;">
+              <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.75rem;">
                 기관을 선택한 후 [조회] 버튼을 눌러주세요.
               </td>
             </tr>
@@ -573,7 +560,7 @@
 
     <!-- 탭 2: 급여처리 -->
     <div id="payrollTab" class="tab-content">
-      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600;">
+      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.9rem;">
         급여처리 기능 화면 준비 중입니다.
       </div>
     </div>
@@ -737,7 +724,7 @@
       }
     }
 
-    // 저장 처리 (확인 팝업 후 저장 메시지)
+    // 저장 처리
     function handleSave() {
       const selectedInst = document.getElementById("institutionSelect").value;
       if (!selectedInst) {
