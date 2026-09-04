@@ -227,6 +227,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
+    /* [요청 2 반영] 기관별 급여대장 -> 공무원 급여대장 */
     .doc-title {
       font-size: 1.35rem;
       font-weight: 800;
@@ -254,6 +255,7 @@
       gap: 10px;
     }
 
+    /* [요청 1 반영] '소속 기관:' -> '소속 기관' */
     .select-label {
       font-size: 0.9rem;
       font-weight: 700;
@@ -265,7 +267,7 @@
       font-size: 0.88rem;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
-      min-width: 200px;
+      min-width: 220px;
       outline: none;
       background-color: #fff;
     }
@@ -346,6 +348,13 @@
     .col-rank { width: 90px; }
     .col-id { width: 110px; }
     
+    /* [요청 4 반영] 감액 항목 연한 빨간색 강조 스타일 */
+    .col-reduction-highlight {
+      background-color: #fef2f2;
+      color: #dc2626;
+      font-weight: 700;
+    }
+
     .col-netpay {
       background-color: #f0f7ff;
       font-weight: 800;
@@ -363,6 +372,10 @@
 
     tr:hover td {
       background-color: #f8fafc;
+    }
+
+    tr:hover td.col-reduction-highlight {
+      background-color: #fee2e2;
     }
 
     tr:hover td.col-netpay {
@@ -425,7 +438,6 @@
           </div>
         </li>
 
-        <!-- active 클래스를 제거하여 초기 페이지 진입 시 열려있지 않게 수정함 -->
         <li class="nav-item">
           <a href="#" class="nav-link">
             <img src="pay.png" alt="" class="menu-icon" onerror="this.style.display='none';">
@@ -482,21 +494,24 @@
 
   <!-- 4. 메인 콘텐츠 (급여대장) -->
   <main class="main-container">
+    <!-- [요청 2 반영] 공무원 급여대장 -->
     <div class="doc-title">
-      <span>기관별 급여대장</span>
+      <span>공무원 급여대장</span>
     </div>
 
     <div class="top-bar">
       <div class="select-group">
-        <label for="institutionSelect" class="select-label">소속 기관:</label>
+        <!-- [요청 1 반영] 소속 기관 -->
+        <label for="institutionSelect" class="select-label">소속 기관</label>
         <select id="institutionSelect" class="select-box">
         </select>
       </div>
       
+      <!-- [요청 3 반영] 제출 버튼 초기 비활성화 disabled -->
       <div class="btn-group">
         <button class="btn-search" onclick="handleSearch()">조회</button>
         <button id="btnClose" class="btn" onclick="handleCloseProcess()" disabled>마감</button>
-        <button class="btn">제출</button>
+        <button id="btnSubmit" class="btn" disabled>제출</button>
       </div>
     </div>
 
@@ -545,17 +560,15 @@
         e.preventDefault();
         const currentItem = this.parentElement;
 
-        // 클릭한 메뉴 외의 다른 메뉴 드롭다운은 모두 닫기
         document.querySelectorAll('.nav-item').forEach(item => {
           if (item !== currentItem) item.classList.remove('active');
         });
 
-        // 클릭한 항목의 메뉴 드롭다운 토글 (열기/닫기)
         currentItem.classList.toggle('active');
       });
     });
 
-    // 드롭다운 내부 하위 메인/서브 링크를 클릭해서 실제 페이지로 이동할 때 드롭다운 바를 닫아줌
+    // 드롭다운 서브 링크 클릭 시 닫기
     document.querySelectorAll('.mega-menu-list a').forEach(subLink => {
       subLink.addEventListener('click', function() {
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -564,20 +577,44 @@
       });
     });
 
-    // 화면 바깥 아무곳이나 클릭 시 열려 있던 드롭다운 메뉴 닫기
+    // 바깥 영역 클릭 시 드롭다운 닫기
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.nav-item')) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       }
     });
 
-    // --- 비즈니스 로직 ---
-    const institutions = ["서울특별시청", "통영시청", "경상남도교육청", "서울중구청"];
+    // --- 비즈니스 로직 및 접근 권한 설정 ---
+    const institutions = [
+      "서울특별시청", 
+      "서울소방서", 
+      "서울경찰청", 
+      "통영시청", 
+      "경상남도교육청", 
+      "서울중구청"
+    ];
+
+    // [요청 5 반영] 사용자/직책별 지정 소속기관 매핑 (예시)
+    // - admin: 메인 관리자 (모든 기관 조회 가능)
+    // - fire_chief: 서울소방서장 (서울소방서만 조회 가능)
+    // - police_chief: 서울경찰서장 (서울경찰청만 조회 가능)
+    const userPermissions = {
+      "admin": "ALL",
+      "fire_chief": "서울소방서",
+      "police_chief": "서울경찰청",
+      "tongyeong_user": "통영시청"
+    };
 
     const mockDbData = {
       "서울특별시청": [
         { rank: "팀장", name: "홍길동", id: "2026001", base: "3,500,000", allowance: "350,000", reduction: "0", deduction: "400,000", total: "3,450,000" },
-        { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "0", deduction: "300,000", total: "2,700,000" }
+        { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "100,000", deduction: "300,000", total: "2,600,000" }
+      ],
+      "서울소방서": [
+        { rank: "소방령", name: "강감찬", id: "2026301", base: "3,800,000", allowance: "600,000", reduction: "0", deduction: "450,000", total: "3,950,000" }
+      ],
+      "서울경찰청": [
+        { rank: "경정", name: "포도대장", id: "2026401", base: "3,900,000", allowance: "550,000", reduction: "50,000", deduction: "480,000", total: "3,920,000" }
       ],
       "통영시청": [
         { rank: "과장", name: "이순신", id: "2026101", base: "4,200,000", allowance: "500,000", reduction: "0", deduction: "550,000", total: "4,150,000" },
@@ -585,15 +622,18 @@
       ]
     };
 
-    async function fetchSalariesFromDB(selectedInstitution) {
-      return mockDbData[selectedInstitution] || [
-        { rank: "주무관", name: "박지성", id: "2026999", base: "3,000,000", allowance: "250,000", reduction: "0", deduction: "350,000", total: "2,900,000" }
-      ];
-    }
-
+    // [요청 1 반영] 선택 불가능한 '(기관을 선택하세요)' 옵션 생성
     function initDropdown() {
       const select = document.getElementById("institutionSelect");
       select.innerHTML = "";
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "(기관을 선택하세요)";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      select.appendChild(defaultOption);
+
       institutions.forEach(inst => {
         const option = document.createElement("option");
         option.value = inst;
@@ -602,11 +642,47 @@
       });
     }
 
+    // [요청 5 반영] 권한 검증 기능
+    function checkPermission(selectedInst) {
+      const currentUser = sessionStorage.getItem('currentUser') || 'admin'; 
+      const allowedInst = userPermissions[currentUser] || userPermissions["admin"];
+
+      // 메인 관리자(admin)이거나 'ALL' 권한인 경우 통과
+      if (currentUser === 'admin' || allowedInst === "ALL") {
+        return true;
+      }
+
+      // 지정된 기관만 조회 가능하도록 제한
+      if (allowedInst === selectedInst) {
+        return true;
+      }
+
+      return false;
+    }
+
     async function handleSearch() {
       const selectedInst = document.getElementById("institutionSelect").value;
-      const data = await fetchSalariesFromDB(selectedInst);
+
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
+
+      // [요청 5 반영] 타 기관 조회 시도 시 차단
+      if (!checkPermission(selectedInst)) {
+        alert("해당 기관의 급여대장을 조회할 권한이 없습니다.");
+        return;
+      }
+
+      const data = mockDbData[selectedInst] || [
+        { rank: "주무관", name: "박지성", id: "2026999", base: "3,000,000", allowance: "250,000", reduction: "0", deduction: "350,000", total: "2,900,000" }
+      ];
+
       renderTable(data);
+
+      // [요청 3 반영] 마감 버튼만 활성화하고 제출 버튼은 비활성화 유지
       document.getElementById("btnClose").disabled = false;
+      document.getElementById("btnSubmit").disabled = true;
     }
 
     function renderTable(data) {
@@ -620,13 +696,18 @@
 
       data.forEach(person => {
         const row = document.createElement("tr");
+
+        // [요청 4 반영] 감액 항목 금액이 존재할 때 연한 빨간색 강조 클래스 적용
+        const reductionVal = parseInt(person.reduction.replace(/,/g, ''), 10) || 0;
+        const reductionClass = reductionVal > 0 ? "col-reduction-highlight text-right" : "text-right";
+
         row.innerHTML = `
           <td class="col-rank">${person.rank}</td>
           <td>${person.name}</td>
           <td class="col-id">${person.id}</td>
           <td class="text-right">${person.base}</td>
           <td class="text-right">${person.allowance}</td>
-          <td class="text-right">${person.reduction}</td>
+          <td class="${reductionClass}">${person.reduction}</td>
           <td class="text-right">${person.deduction}</td>
           <td class="col-netpay">${person.total}</td>
         `;
