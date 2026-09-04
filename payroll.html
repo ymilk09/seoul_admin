@@ -227,7 +227,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* [요청 2 반영] 기관별 급여대장 -> 공무원 급여대장 */
     .doc-title {
       font-size: 1.35rem;
       font-weight: 800;
@@ -347,7 +346,6 @@
     .col-rank { width: 90px; }
     .col-id { width: 110px; }
     
-    /* [요청 4 반영] 감액 항목 연한 빨간색 강조 스타일 */
     .col-reduction-highlight {
       background-color: #fef2f2;
       color: #dc2626;
@@ -393,7 +391,6 @@
 </head>
 <body>
 
-  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -401,7 +398,6 @@
     </div>
   </div>
 
-  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -415,7 +411,6 @@
     </div>
   </div>
 
-  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -491,22 +486,18 @@
     </div>
   </header>
 
-  <!-- 4. 메인 콘텐츠 (급여대장) -->
   <main class="main-container">
-    <!-- [요청 2 반영] 공무원 급여대장 -->
     <div class="doc-title">
       <span>공무원 급여대장</span>
     </div>
 
     <div class="top-bar">
       <div class="select-group">
-        <!-- [요청 1 반영] 소속 기관 -->
         <label for="institutionSelect" class="select-label">소속 기관</label>
         <select id="institutionSelect" class="select-box">
         </select>
       </div>
       
-      <!-- [요청 3 반영] 제출 버튼 초기 비활성화 disabled -->
       <div class="btn-group">
         <button class="btn-search" onclick="handleSearch()">조회</button>
         <button id="btnClose" class="btn" onclick="handleCloseProcess()" disabled>마감</button>
@@ -583,37 +574,27 @@
       }
     });
 
-    // --- 비즈니스 로직 및 접근 권한 설정 ---
+    // --- 비즈니스 로직 ---
     const institutions = [
       "서울특별시청", 
       "서울특별시경찰청", 
       "서울특별시소방재난본부"
     ];
 
-    // [요청 5 반영] 사용자/직책별 지정 소속기관 매핑 (예시)
-    const userPermissions = {
-      "f19fdb96-35a2-44f1-bb4e-f271984649c4": "ALL",
-      "wonkyun0314@naver.com": "서울특별시경찰청"
-    };
-
     const mockDbData = {
       "서울특별시청": [
         { rank: "팀장", name: "홍길동", id: "2026001", base: "3,500,000", allowance: "350,000", reduction: "0", deduction: "400,000", total: "3,450,000" },
         { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "100,000", deduction: "300,000", total: "2,600,000" }
       ],
-      "서울소방서": [
-        { rank: "소방령", name: "강감찬", id: "2026301", base: "3,800,000", allowance: "600,000", reduction: "0", deduction: "450,000", total: "3,950,000" }
-      ],
-      "서울경찰청": [
+      "서울특별시경찰청": [
         { rank: "경정", name: "포도대장", id: "2026401", base: "3,900,000", allowance: "550,000", reduction: "50,000", deduction: "480,000", total: "3,920,000" }
       ],
-      "통영시청": [
-        { rank: "과장", name: "이순신", id: "2026101", base: "4,200,000", allowance: "500,000", reduction: "0", deduction: "550,000", total: "4,150,000" },
-        { rank: "사원", name: "이영희", id: "2026102", base: "2,400,000", allowance: "150,000", reduction: "50,000", deduction: "220,000", total: "2,280,000" }
+      "서울특별시소방재난본부": [
+        { rank: "소방령", name: "강감찬", id: "2026301", base: "3,800,000", allowance: "600,000", reduction: "0", deduction: "450,000", total: "3,950,000" }
       ]
     };
 
-    // [요청 1 반영] 선택 불가능한 '(기관을 선택하세요)' 옵션 생성
+    // 선택 불가능한 '(기관을 선택하세요)' 옵션 생성
     function initDropdown() {
       const select = document.getElementById("institutionSelect");
       select.innerHTML = "";
@@ -633,35 +614,11 @@
       });
     }
 
-    // [요청 5 반영] 권한 검증 기능
-    function checkPermission(selectedInst) {
-      const currentUser = sessionStorage.getItem('currentUser') || 'admin'; 
-      const allowedInst = userPermissions[currentUser] || userPermissions["admin"];
-
-      // 메인 관리자(admin)이거나 'ALL' 권한인 경우 통과
-      if (currentUser === 'admin' || allowedInst === "ALL") {
-        return true;
-      }
-
-      // 지정된 기관만 조회 가능하도록 제한
-      if (allowedInst === selectedInst) {
-        return true;
-      }
-
-      return false;
-    }
-
     async function handleSearch() {
       const selectedInst = document.getElementById("institutionSelect").value;
 
       if (!selectedInst) {
         alert("기관을 선택하세요.");
-        return;
-      }
-
-      // [요청 5 반영] 타 기관 조회 시도 시 차단
-      if (!checkPermission(selectedInst)) {
-        alert("해당 기관의 급여대장을 조회할 권한이 없습니다.");
         return;
       }
 
@@ -671,7 +628,7 @@
 
       renderTable(data);
 
-      // [요청 3 반영] 마감 버튼만 활성화하고 제출 버튼은 비활성화 유지
+      // 마감 버튼만 활성화, 제출 버튼은 비활성화 유지
       document.getElementById("btnClose").disabled = false;
       document.getElementById("btnSubmit").disabled = true;
     }
@@ -688,7 +645,6 @@
       data.forEach(person => {
         const row = document.createElement("tr");
 
-        // [요청 4 반영] 감액 항목 금액이 존재할 때 연한 빨간색 강조 클래스 적용
         const reductionVal = parseInt(person.reduction.replace(/,/g, ''), 10) || 0;
         const reductionClass = reductionVal > 0 ? "col-reduction-highlight text-right" : "text-right";
 
