@@ -235,7 +235,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* 상단 탭 메뉴 (수당처리, 감액처리 추가) */
+    /* 상단 탭 메뉴 */
     .tab-menu {
       display: flex;
       gap: 30px;
@@ -359,13 +359,15 @@
       height: 36px;
     }
 
-    /* 순번, 대상자 컬럼 좁게 설정 */
-    .col-seq { width: 5%; }       /* 순번(좁게) */
-    .col-name { width: 18%; }     /* 성명 */
-    .col-id { width: 22%; }       /* 고유번호 */
-    .col-rank { width: 18%; }     /* 직급 */
-    .col-date { width: 20%; }     /* 임용일 */
-    .col-target { width: 8%; }   /* 대상자(좁게) */
+    /* 컬럼 폭 제어 */
+    .col-seq { width: 5%; }
+    .col-name { width: 12%; }
+    .col-id { width: 15%; }
+    .col-rank { width: 12%; }
+    .col-date { width: 16%; }
+    .col-target { width: 8%; }
+    
+    .col-allowance { width: 14%; }
 
     .checkbox-custom {
       width: 15px;
@@ -384,6 +386,28 @@
       font-size: 0.85rem;
     }
 
+    /* 수당 입력 텍스트박스 스타일 */
+    .allowance-input-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .input-allowance {
+      width: 80px;
+      padding: 3px 6px;
+      font-size: 0.8rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      text-align: right;
+      outline: none;
+    }
+
+    .input-allowance:focus {
+      border-color: #5b73e8;
+    }
+
     tr:hover td {
       background-color: #f8fafc;
     }
@@ -399,6 +423,7 @@
 </head>
 <body>
 
+  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -406,6 +431,7 @@
     </div>
   </div>
 
+  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -419,6 +445,7 @@
     </div>
   </div>
 
+  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -494,23 +521,27 @@
     </div>
   </header>
 
+  <!-- 4. 메인 콘텐츠 영역 -->
   <main class="main-container">
+    <!-- 탭 헤더 -->
     <div class="tab-menu">
       <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 생성</button>
       <button class="tab-btn" onclick="switchTab('allowanceTab', this)">수당처리</button>
       <button class="tab-btn" onclick="switchTab('reductionTab', this)">감액처리</button>
     </div>
 
+    <!-- 탭 1: 대상자 생성 -->
     <div id="targetTab" class="tab-content active">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect" class="select-box">
-            </select>
+          <select id="institutionSelect1" class="select-box">
+            <!-- 자바스크립트에서 옵션 생성 -->
+          </select>
         </div>
         
         <div class="btn-group">
-          <button class="btn-action" onclick="handleSearch()">조회</button>
-          <button id="btnSave" class="btn-action" onclick="handleSave()" disabled>저장</button>
+          <button class="btn-action" onclick="handleSearchTarget()">조회</button>
+          <button id="btnSaveTarget" class="btn-action" onclick="handleSaveTarget()" disabled>저장</button>
         </div>
       </div>
 
@@ -542,12 +573,59 @@
       </div>
     </div>
 
+    <!-- 탭 2: 수당처리 (요구사항 반영) -->
     <div id="allowanceTab" class="tab-content">
-      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
-        수당처리 기능 화면입니다.
+      <div class="top-bar">
+        <div class="select-group">
+          <select id="institutionSelect2" class="select-box">
+            <!-- 자바스크립트에서 옵션 생성 -->
+          </select>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchAllowance()">조회</button>
+          <button id="btnSaveAllowance" class="btn-action" onclick="handleSaveAllowance()" disabled>저장</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-seq">순번</th>
+              <th class="col-name">성명</th>
+              <th class="col-id">고유번호</th>
+              <th class="col-rank">직급</th>
+              <th class="col-allowance">
+                <div>수당1</div>
+                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(1, this)" checked></div>
+              </th>
+              <th class="col-allowance">
+                <div>수당2</div>
+                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(2, this)" checked></div>
+              </th>
+              <th class="col-allowance">
+                <div>수당3</div>
+                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(3, this)" checked></div>
+              </th>
+              <th class="col-allowance">
+                <div>수당4</div>
+                <div><input type="checkbox" class="checkbox-custom" onclick="toggleAllowanceColumn(4, this)" checked></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="allowanceTableBody">
+            <tr>
+              <td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
+                기관 선택 후 [조회]를 누르면 '대상자 생성'에서 체크된 대상자만 조회됩니다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
+    <!-- 탭 3: 감액처리 -->
     <div id="reductionTab" class="tab-content">
       <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
         감액처리 기능 화면입니다.
@@ -565,7 +643,7 @@
       }
     }
 
-    // 상단 네비게이션 메뉴 클릭 이벤트
+    // 네비게이션 메뉴 이벤트
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -579,127 +657,139 @@
       });
     });
 
-    // 드롭다운 서브 링크 클릭 시 닫기
     document.querySelectorAll('.mega-menu-list a').forEach(subLink => {
       subLink.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       });
     });
 
-    // 바깥 영역 클릭 시 드롭다운 닫기
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.nav-item')) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       }
     });
 
-    // --- 급여 작업 비즈니스 로직 ---
+    // --- 데이터 및 비즈니스 로직 ---
     const institutions = [
       "서울특별시청", 
       "서울특별시경찰청", 
       "서울특별시소방재난본부"
     ];
 
+    // 기본 가상 데이터
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01" },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15" }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, allowance1: 100000, allowance2: 50000, allowance3: 30000, allowance4: 20000 },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, allowance1: 80000, allowance2: 40000, allowance3: 30000, allowance4: 10000 },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, allowance1: 80000, allowance2: 40000, allowance3: 30000, allowance4: 10000 }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10" }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, allowance1: 120000, allowance2: 60000, allowance3: 50000, allowance4: 30000 }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01" }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, allowance1: 110000, allowance2: 55000, allowance3: 40000, allowance4: 25000 }
       ]
     };
 
-    // 기관 드롭다운 초기화
-    function initDropdown() {
-      const select = document.getElementById("institutionSelect");
-      select.innerHTML = "";
+    // 드롭다운 초기화
+    function initDropdowns() {
+      const selects = [document.getElementById("institutionSelect1"), document.getElementById("institutionSelect2")];
 
-      const defaultOption = document.createElement("option");
-      defaultOption.value = "";
-      defaultOption.textContent = "기관 선택할 수 있게 드롭다운";
-      defaultOption.disabled = true;
-      defaultOption.selected = true;
-      select.appendChild(defaultOption);
+      selects.forEach(select => {
+        select.innerHTML = "";
 
-      institutions.forEach(inst => {
-        const option = document.createElement("option");
-        option.value = inst;
-        option.textContent = inst;
-        select.appendChild(option);
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "기관 선택할 수 있게 드롭다운";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        select.appendChild(defaultOption);
+
+        institutions.forEach(inst => {
+          const option = document.createElement("option");
+          option.value = inst;
+          option.textContent = inst;
+          select.appendChild(option);
+        });
       });
     }
 
-    // 탭 전환 함수
+    // 탭 전환
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+
+      // 탭 전환 시 드롭다운 값 동기화
+      const select1 = document.getElementById("institutionSelect1");
+      const select2 = document.getElementById("institutionSelect2");
+      if (tabId === 'allowanceTab' && select1.value) {
+        select2.value = select1.value;
+      } else if (tabId === 'targetTab' && select2.value) {
+        select1.value = select2.value;
+      }
     }
 
-    // 조회 처리
-    function handleSearch() {
-      const selectedInst = document.getElementById("institutionSelect").value;
-
+    // 1. [대상자 생성] - 조회
+    function handleSearchTarget() {
+      const selectedInst = document.getElementById("institutionSelect1").value;
       if (!selectedInst) {
         alert("기관을 선택하세요.");
         return;
       }
 
-      const data = mockTargetData[selectedInst] || [
-        { seq: 1, name: "박지성", id: "2026999", rank: "주무관", date: "2023-05-01" }
-      ];
-
-      renderTable(data);
-      document.getElementById("btnSave").disabled = false; // 저장 버튼 활성화
+      const data = mockTargetData[selectedInst] || [];
+      renderTargetTable(data);
+      document.getElementById("btnSaveTarget").disabled = false;
     }
 
-    // 데이터 랜더링
-    function renderTable(data) {
+    function renderTargetTable(data) {
       const tbody = document.getElementById("targetTableBody");
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px 0;">조회된 대상자가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">조회된 대상자가 없습니다.</td></tr>`;
         return;
       }
 
-      const selectAllCb = document.getElementById("selectAllCheckbox");
-      if (selectAllCb) selectAllCb.checked = true;
-
-      data.forEach(item => {
+      data.forEach((item, index) => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
-          <td class="col-seq">${item.seq}</td>
+          <td class="col-seq">${index + 1}</td>
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
           <td class="col-date">${item.date}</td>
           <td class="col-target">
-            <input type="checkbox" class="checkbox-custom row-checkbox" checked onchange="updateSelectAllStatus()">
+            <input type="checkbox" class="checkbox-custom row-checkbox" ${item.isTarget ? 'checked' : ''} onchange="updateTargetStatus(${index}, this.checked)">
           </td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // 전체 선택/해제 토글
+    function updateTargetStatus(index, isChecked) {
+      const selectedInst = document.getElementById("institutionSelect1").value;
+      if (mockTargetData[selectedInst] && mockTargetData[selectedInst][index]) {
+        mockTargetData[selectedInst][index].isTarget = isChecked;
+      }
+      updateSelectAllStatus();
+    }
+
     function toggleSelectAll(selectAllCb) {
+      const selectedInst = document.getElementById("institutionSelect1").value;
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-      rowCheckboxes.forEach(cb => {
+      
+      rowCheckboxes.forEach((cb, idx) => {
         cb.checked = selectAllCb.checked;
+        if (mockTargetData[selectedInst] && mockTargetData[selectedInst][idx]) {
+          mockTargetData[selectedInst][idx].isTarget = selectAllCb.checked;
+        }
       });
     }
 
-    // 개별 체크 해제 시 연동
     function updateSelectAllStatus() {
       const selectAllCb = document.getElementById("selectAllCheckbox");
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
@@ -712,22 +802,85 @@
       }
     }
 
-    // 저장 처리
-    function handleSave() {
-      const selectedInst = document.getElementById("institutionSelect").value;
+    function handleSaveTarget() {
+      alert("대상자 설정이 저장되었습니다.");
+    }
+
+    // 2. [수당처리] - 조회 (대상자로 체크된 사람만 출력)
+    function handleSearchAllowance() {
+      const selectedInst = document.getElementById("institutionSelect2").value;
       if (!selectedInst) {
-        alert("기관을 선택해 주세요.");
+        alert("기관을 선택하세요.");
         return;
       }
 
-      const confirmResult = confirm("대상자 정보를 저장하시겠습니까?");
-      if (confirmResult) {
-        alert("저장되었습니다.");
+      const allData = mockTargetData[selectedInst] || [];
+      // 대상자로 체크(isTarget === true)된 사람만 필터링
+      const filteredData = allData.filter(item => item.isTarget);
+
+      renderAllowanceTable(filteredData);
+      document.getElementById("btnSaveAllowance").disabled = false;
+    }
+
+    function renderAllowanceTable(data) {
+      const tbody = document.getElementById("allowanceTableBody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8;">'대상자 생성'에서 선택된 대상자가 없습니다.</td></tr>`;
+        return;
       }
+
+      data.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="col-seq">${index + 1}</td>
+          <td class="col-name">${item.name}</td>
+          <td class="col-id">${item.id}</td>
+          <td class="col-rank">${item.rank}</td>
+          <td class="col-allowance">
+            <div class="allowance-input-group">
+              <input type="checkbox" class="checkbox-custom allow-cb-1" checked>
+              <input type="text" class="input-allowance" value="${item.allowance1.toLocaleString()}">
+            </div>
+          </td>
+          <td class="col-allowance">
+            <div class="allowance-input-group">
+              <input type="checkbox" class="checkbox-custom allow-cb-2" checked>
+              <input type="text" class="input-allowance" value="${item.allowance2.toLocaleString()}">
+            </div>
+          </td>
+          <td class="col-allowance">
+            <div class="allowance-input-group">
+              <input type="checkbox" class="checkbox-custom allow-cb-3" checked>
+              <input type="text" class="input-allowance" value="${item.allowance3.toLocaleString()}">
+            </div>
+          </td>
+          <td class="col-allowance">
+            <div class="allowance-input-group">
+              <input type="checkbox" class="checkbox-custom allow-cb-4" checked>
+              <input type="text" class="input-allowance" value="${item.allowance4.toLocaleString()}">
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 수당 컬럼 전체 체크/해제
+    function toggleAllowanceColumn(num, masterCb) {
+      const targetCbs = document.querySelectorAll(`.allow-cb-${num}`);
+      targetCbs.forEach(cb => {
+        cb.checked = masterCb.checked;
+      });
+    }
+
+    function handleSaveAllowance() {
+      alert("저장되었습니다.");
     }
 
     window.onload = function() {
-      initDropdown();
+      initDropdowns();
     };
   </script>
 
