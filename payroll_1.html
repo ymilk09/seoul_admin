@@ -16,11 +16,19 @@
   </script>
 
   <style>
+    /* 웹폰트 정의: SeoulHangangEB.ttf */
+    @font-face {
+      font-family: 'SeoulHangangEB';
+      src: url('SeoulHangangEB.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: 'SeoulHangangEB', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -227,21 +235,21 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* 상단 탭 메뉴 */
+    /* 상단 탭 메뉴 (수당처리, 감액처리 추가) */
     .tab-menu {
       display: flex;
       gap: 30px;
       border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .tab-btn {
       background: none;
       border: none;
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: #000000;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
       cursor: pointer;
       position: relative;
     }
@@ -253,19 +261,17 @@
       left: 0;
       width: 100%;
       height: 4px;
-      background-color: #5c7cfa;
+      background-color: #5b73e8;
     }
 
-    /* 상단 컨트롤 바 (폰트 축소 적용) */
+    /* 상단 컨트롤 바 */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      background-color: #f8fafc;
-      padding: 10px 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
+      margin-bottom: 20px;
+      background-color: #ffffff;
+      padding: 6px 0;
     }
 
     .select-group {
@@ -275,66 +281,50 @@
     }
 
     .select-box {
-      padding: 5px 8px;
-      font-size: 0.8rem; /* 글꼴 축소 */
+      padding: 6px 10px;
+      font-size: 0.85rem;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
-      min-width: 200px;
+      min-width: 220px;
       outline: none;
       background-color: #fff;
     }
 
     .select-box:focus {
-      border-color: #4c75f2;
+      border-color: #5b73e8;
     }
 
-    /* 버튼 스타일 (폰트 축소 적용) */
+    /* 이미지 스타일 [조회], [저장] 버튼 */
     .btn-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .btn-search {
-      padding: 4px 10px;
-      font-size: 12px; /* 글꼴 축소 */
+    .btn-action {
+      padding: 6px 18px;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #ffffff;
-      background-color: #4c75f2;
+      background-color: #5b73e8;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 1px 3px rgba(76, 117, 242, 0.2);
-      transition: all 0.15s ease;
+      box-shadow: 0 2px 4px rgba(91, 115, 232, 0.25);
+      transition: all 0.2s ease;
     }
 
-    .btn-search:hover {
-      background-color: #3b62e0;
+    .btn-action:hover:not(:disabled) {
+      background-color: #4a60d2;
     }
 
-    .btn {
-      padding: 4px 10px;
-      font-size: 12px; /* 글꼴 축소 */
-      font-weight: 700;
-      color: #ffffff;
-      background-color: #64748b;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn:hover:not(:disabled) {
-      background-color: #475569;
-    }
-
-    .btn:disabled {
-      background-color: #cbd5e1;
-      color: #94a3b8;
+    .btn-action:disabled {
+      background-color: #a5b4fc;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
-    /* 표 사이즈 및 스타일 설정 (대상자 영역 폰트 축소 적용) */
+    /* 표 사이즈 및 스타일 설정 */
     .table-wrapper {
       width: 100%;
       overflow-x: auto;
@@ -347,11 +337,11 @@
       table-layout: fixed;
       border-collapse: collapse;
       text-align: center;
-      font-size: 0.75rem; /* 표 전체 글꼴 크기 축소 */
+      font-size: 0.85rem;
     }
 
     th, td {
-      padding: 6px 4px;
+      padding: 8px 4px;
       border: 1px solid #e2e8f0;
       white-space: nowrap;
       overflow: hidden;
@@ -359,29 +349,29 @@
     }
 
     th {
-      background-color: #f1f5f9;
+      background-color: #f8fafc;
       font-weight: 700;
       color: #1e293b;
-      height: 32px; /* 헤더 높이 조절 */
+      height: 38px;
     }
 
     td {
-      height: 34px; /* 셀 높이 조절 */
+      height: 36px;
     }
 
-    /* 열 폭 지정 */
-    .col-seq { width: 8%; }       /* 순번 */
+    /* 순번, 대상자 컬럼 좁게 설정 */
+    .col-seq { width: 5%; }       /* 순번(좁게) */
     .col-name { width: 18%; }     /* 성명 */
     .col-id { width: 22%; }       /* 고유번호 */
     .col-rank { width: 18%; }     /* 직급 */
     .col-date { width: 20%; }     /* 임용일 */
-    .col-target { width: 14%; }   /* 대상자 */
+    .col-target { width: 8%; }   /* 대상자(좁게) */
 
     .checkbox-custom {
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       cursor: pointer;
-      accent-color: #4c75f2;
+      accent-color: #5b73e8;
       vertical-align: middle;
     }
 
@@ -389,8 +379,9 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
-      font-size: 0.75rem; /* 체크박스 라벨 글꼴 축소 */
+      font-size: 0.85rem;
     }
 
     tr:hover td {
@@ -408,7 +399,6 @@
 </head>
 <body>
 
-  <!-- 1. 최상단 안내 띠 -->
   <div class="top-header">
     <div class="top-header-container">
       <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
@@ -416,7 +406,6 @@
     </div>
   </div>
 
-  <!-- 2. 로고 및 유틸리티 영역 -->
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
@@ -430,7 +419,6 @@
     </div>
   </div>
 
-  <!-- 3. 메인 네비게이션바 -->
   <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
@@ -506,26 +494,23 @@
     </div>
   </header>
 
-  <!-- 4. 메인 콘텐츠 (급여 작업 영역) -->
   <main class="main-container">
-    <!-- 탭 헤더 -->
     <div class="tab-menu">
       <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 생성</button>
-      <button class="tab-btn" onclick="switchTab('payrollTab', this)">급여처리</button>
+      <button class="tab-btn" onclick="switchTab('allowanceTab', this)">수당처리</button>
+      <button class="tab-btn" onclick="switchTab('reductionTab', this)">감액처리</button>
     </div>
 
-    <!-- 탭 1: 대상자 생성 -->
     <div id="targetTab" class="tab-content active">
       <div class="top-bar">
         <div class="select-group">
           <select id="institutionSelect" class="select-box">
-            <!-- 자바스크립트에서 옵션 생성 -->
-          </select>
+            </select>
         </div>
         
         <div class="btn-group">
-          <button class="btn-search" onclick="handleSearch()">조회</button>
-          <button id="btnSave" class="btn" onclick="handleSave()" disabled>저장</button>
+          <button class="btn-action" onclick="handleSearch()">조회</button>
+          <button id="btnSave" class="btn-action" onclick="handleSave()" disabled>저장</button>
         </div>
       </div>
 
@@ -539,7 +524,6 @@
               <th class="col-rank">직급</th>
               <th class="col-date">임용일</th>
               <th class="col-target">
-                <!-- 전체 선택/해제 체크박스 -->
                 <label class="th-checkbox-label">
                   <input type="checkbox" id="selectAllCheckbox" class="checkbox-custom" onclick="toggleSelectAll(this)" checked>
                   <span>대상자</span>
@@ -549,8 +533,8 @@
           </thead>
           <tbody id="targetTableBody">
             <tr>
-              <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.75rem;">
-                기관을 선택한 후 [조회] 버튼을 눌러주세요.
+              <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
+                기관을 선택할 수 있게 드롭다운에서 선택 후 [조회] 버튼을 눌러주세요.
               </td>
             </tr>
           </tbody>
@@ -558,10 +542,15 @@
       </div>
     </div>
 
-    <!-- 탭 2: 급여처리 -->
-    <div id="payrollTab" class="tab-content">
-      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.9rem;">
-        급여처리 기능 화면 준비 중입니다.
+    <div id="allowanceTab" class="tab-content">
+      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
+        수당처리 기능 화면입니다.
+      </div>
+    </div>
+
+    <div id="reductionTab" class="tab-content">
+      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
+        감액처리 기능 화면입니다.
       </div>
     </div>
   </main>
@@ -576,7 +565,7 @@
       }
     }
 
-    // 상단 네비게이션 메뉴 클릭 이벤트 (토글)
+    // 상단 네비게이션 메뉴 클릭 이벤트
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -633,7 +622,7 @@
 
       const defaultOption = document.createElement("option");
       defaultOption.value = "";
-      defaultOption.textContent = "(기관을 선택하세요)";
+      defaultOption.textContent = "기관 선택할 수 있게 드롭다운";
       defaultOption.disabled = true;
       defaultOption.selected = true;
       select.appendChild(defaultOption);
@@ -672,7 +661,7 @@
       document.getElementById("btnSave").disabled = false; // 저장 버튼 활성화
     }
 
-    // 데이터 랜더링 (항상 모든 대상자 선택 상태 기본값)
+    // 데이터 랜더링
     function renderTable(data) {
       const tbody = document.getElementById("targetTableBody");
       tbody.innerHTML = "";
@@ -682,7 +671,6 @@
         return;
       }
 
-      // 상단 전체 체크박스 초기화
       const selectAllCb = document.getElementById("selectAllCheckbox");
       if (selectAllCb) selectAllCb.checked = true;
 
@@ -703,7 +691,7 @@
       });
     }
 
-    // 전체 선택/해제 토글 기능
+    // 전체 선택/해제 토글
     function toggleSelectAll(selectAllCb) {
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
       rowCheckboxes.forEach(cb => {
@@ -711,7 +699,7 @@
       });
     }
 
-    // 개별 체크 해제 시 전체 선택 체크박스 상태 연동
+    // 개별 체크 해제 시 연동
     function updateSelectAllStatus() {
       const selectAllCb = document.getElementById("selectAllCheckbox");
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
