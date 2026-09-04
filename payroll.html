@@ -183,9 +183,9 @@
       padding: 25px 0;
     }
 
-.nav-item:hover .mega-dropdown {
-  display: block;
-}
+    .nav-item.active .mega-dropdown {
+      display: block;
+    }
 
     .mega-dropdown-container {
       max-width: 1280px;
@@ -223,7 +223,7 @@
       padding: 28px 32px;
       background-color: #ffffff;
       border: 1px solid #cbd5e1;
-      border-radius: 4px; /* 각진 서식 느낌 적용 */
+      border-radius: 4px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
@@ -280,7 +280,6 @@
       gap: 6px;
     }
 
-    /* 요청된 조회 버튼 스타일 */
     .btn-search {
       padding: 5px 12px;
       font-size: 13px;
@@ -298,7 +297,6 @@
       background-color: #3b62e0;
     }
 
-    /* 일반 버튼 스타일 (마감, 제출) */
     .btn {
       padding: 5px 12px;
       font-size: 13px;
@@ -321,7 +319,6 @@
       cursor: not-allowed;
     }
 
-    /* 표 스타일링 (보수 대장 문서 스타일) */
     .table-wrapper {
       overflow-x: auto;
       border-top: 2px solid #1e293b;
@@ -346,7 +343,6 @@
       color: #1e293b;
     }
 
-    /* 열 폭 조정 및 실수령액 강조 */
     .col-rank { width: 90px; }
     .col-id { width: 110px; }
     
@@ -373,7 +369,6 @@
       background-color: #e0f2fe;
     }
 
-    /* 하단 안내 문구 */
     .notice-text {
       margin-top: 16px;
       font-size: 0.85rem;
@@ -430,7 +425,8 @@
           </div>
         </li>
 
-        <li class="nav-item active">
+        <!-- active 클래스를 제거하여 초기 페이지 진입 시 열려있지 않게 수정함 -->
+        <li class="nav-item">
           <a href="#" class="nav-link">
             <img src="pay.png" alt="" class="menu-icon" onerror="this.style.display='none';">
             <span>보수관리</span>
@@ -494,7 +490,6 @@
       <div class="select-group">
         <label for="institutionSelect" class="select-label">소속 기관:</label>
         <select id="institutionSelect" class="select-box">
-          <!-- 동적 생성 -->
         </select>
       </div>
       
@@ -544,32 +539,40 @@
       }
     }
 
-    // 네비게이션 드롭다운 메뉴 토글
+    // 상단 네비게이션 메뉴 클릭 이벤트 (토글)
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const currentItem = this.parentElement;
+
+        // 클릭한 메뉴 외의 다른 메뉴 드롭다운은 모두 닫기
         document.querySelectorAll('.nav-item').forEach(item => {
           if (item !== currentItem) item.classList.remove('active');
         });
+
+        // 클릭한 항목의 메뉴 드롭다운 토글 (열기/닫기)
         currentItem.classList.toggle('active');
       });
     });
 
+    // 드롭다운 내부 하위 메인/서브 링크를 클릭해서 실제 페이지로 이동할 때 드롭다운 바를 닫아줌
+    document.querySelectorAll('.mega-menu-list a').forEach(subLink => {
+      subLink.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+      });
+    });
+
+    // 화면 바깥 아무곳이나 클릭 시 열려 있던 드롭다운 메뉴 닫기
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.nav-item')) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       }
     });
 
-    // --- DB 연동 준비 및 비즈니스 로직 ---
-
-    const institutions = [
-      "서울특별시청", 
-      "통영시청", 
-      "경상남도교육청", 
-      "서울중구청"
-    ];
+    // --- 비즈니스 로직 ---
+    const institutions = ["서울특별시청", "통영시청", "경상남도교육청", "서울중구청"];
 
     const mockDbData = {
       "서울특별시청": [
@@ -582,17 +585,7 @@
       ]
     };
 
-    // DB 조회 비동기 함수 세팅
     async function fetchSalariesFromDB(selectedInstitution) {
-      /*
-      // [실제 DB 구축 후 연결 코드 예시]
-      try {
-        const response = await fetch(`/api/salaries?institution=${encodeURIComponent(selectedInstitution)}`);
-        return await response.json();
-      } catch (error) {
-        console.error('DB Fetch Error:', error);
-      }
-      */
       return mockDbData[selectedInstitution] || [
         { rank: "주무관", name: "박지성", id: "2026999", base: "3,000,000", allowance: "250,000", reduction: "0", deduction: "350,000", total: "2,900,000" }
       ];
@@ -613,8 +606,6 @@
       const selectedInst = document.getElementById("institutionSelect").value;
       const data = await fetchSalariesFromDB(selectedInst);
       renderTable(data);
-
-      // 마감 버튼 활성화
       document.getElementById("btnClose").disabled = false;
     }
 
