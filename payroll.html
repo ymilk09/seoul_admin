@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEOUL MY SOUL</title>
+
+  <script>
+  (function checkAuth() {
+    const currentUser = sessionStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert('로그인이 필요한 서비스입니다.');
+      location.replace('login.html');
+    }
+  })();
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* 1. 최상단 안내 띠 */
+    .top-header {
+      background-color: #F2F2F2;
+      color: #000000;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .top-header-container {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flag-icon {
+      height: 15px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .top-header-text {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+    }
+
+    /* 2. 로고 및 유틸리티 영역 */
+    .header-middle {
+      background-color: #ffffff;
+      padding: 22px 0;
+    }
+
+    .header-middle-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #F2F2F2;
+    }
+
+    .brand-logo img {
+      height: 23px;
+      width: auto;
+    }
+
+    .util-bottom-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      list-style: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .util-bottom-links a {
+      text-decoration: none;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .util-bottom-links a:hover {
+      color: #2563eb;
+    }
+
+    /* 3. 메인 네비게이션바 */
+    .navbar {
+      background-color: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      border-bottom: 2px solid #BFBFBF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      height: 55px;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      height: 100%;
+      gap: 15px;
+    }
+
+    .nav-item {
+      position: static;
+      height: 100%;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      height: 100%;
+      text-decoration: none;
+      color: #4a5568;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    .nav-link:hover,
+    .nav-item.active > .nav-link {
+      color: #4A5366;
+      background-color: #f8fafc;
+      border-bottom: 1px solid #BFBFBF;
+    }
+
+    .mega-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+      padding: 25px 0;
+    }
+
+    .nav-item.active .mega-dropdown {
+      display: block;
+    }
+
+    .mega-dropdown-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 40px;
+    }
+
+    .mega-menu-list {
+      list-style: none;
+      display: flex;
+      gap: 30px;
+    }
+
+    .mega-menu-list li a {
+      text-decoration: none;
+      font-size: 0.95rem;
+      color: #4a5568;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .mega-menu-list a:hover {
+      color: #2563eb;
+      background-color: #f1f5f9;
+    }
+
+    /* 4. 메인 콘텐츠 영역 (급여/보수 관리 영역) */
+    .main-container {
+      max-width: 1280px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 상단 컨트롤 영역 */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .select-box {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      min-width: 220px;
+      outline: none;
+      background-color: #fff;
+    }
+
+    .select-box:focus {
+      border-color: #4c75f2;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 요청된 조회 버튼 스타일 */
+    .btn-search {
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #4c75f2;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(76, 117, 242, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-search:hover {
+      background-color: #3b62e0;
+      transform: translateY(-1px);
+    }
+
+    /* 일반 버튼 스타일 (마감, 제출 등) */
+    .btn {
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #64748b;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #475569;
+    }
+
+    /* 표 스타일링 */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+      border-top: 2px solid #cbd5e1;
+    }
+
+    td {
+      color: #475569;
+    }
+
+    tr:hover {
+      background-color: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 최상단 안내 띠 -->
+  <div class="top-header">
+    <div class="top-header-container">
+      <img src="https://i.namu.wiki/i/IpVSj-BLH7WtjivfEInwSes-HO22iclfabXs6xh5dm8vJ_W5mXV9QTvPoIFFiLC2M4g2p_lQk0zWMgnAw09LXA.svg" alt="태극기" class="flag-icon" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('beforebegin', '<span style=\'font-size:1.1rem; margin-right:4px;\'>🇰🇷</span>');">
+      <span class="top-header-text">이 누리집은 메타버스 통영에서 운영하는 누리집입니다.</span>
+    </div>
+  </div>
+
+  <!-- 2. 로고 및 유틸리티 영역 -->
+  <div class="header-middle">
+    <div class="header-middle-container">
+      <div class="brand-logo">
+        <a href="#">
+          <img src="home.png" alt="SEOUL MY SOUL" onerror="this.style.display='none';">
+        </a>
+      </div>
+      <ul class="util-bottom-links">
+        <li><a href="#" onclick="handleLogout(event)">로그아웃</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. 메인 네비게이션바 -->
+  <header class="navbar">
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <img src="doc.png" alt="" class="menu-icon" onerror="this.style.display='none';">
+            <span>문서관리</span>
+          </a>
+          <div class="mega-dropdown">
+            <div class="mega-dropdown-container">
+              <ul class="mega-menu-list">
+                <li><a href="approval.html">홈</a></li>
+                <li><a href="approval.html">기안</a></li>
+                <li><a href="#">결재</a></li>
+                <li><a href="#">수신</a></li>
+                <li><a href="#">문서대장</a></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <img src="pay.png" alt="" class="menu-icon" onerror="this.style.display='none';">
+            <span>보수관리</span>
+          </a>
+          <div class="mega-dropdown">
+            <div class="mega-dropdown-container">
+              <ul class="mega-menu-list">
+                <li><a href="#">급여대장 작성</a></li>
+                <li><a href="#">급여대장 제출</a></li>
+                <li><a href="#">급여명세서 확인</a></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <img src="hr.png" alt="" class="menu-icon" onerror="this.style.display='none';">
+            <span>인사관리</span>
+          </a>
+          <div class="mega-dropdown">
+            <div class="mega-dropdown-container">
+              <ul class="mega-menu-list">
+                <li><a href="#">내 인사기록</a></li>
+                <li><a href="#">복무관리</a></li>
+                <li><a href="#">인사발령</a></li>
+                <li><a href="#">징계</a></li>
+                <li><a href="#">휴직</a></li>
+                <li><a href="#">의원면직</a></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <img src="welfare.png" alt="" class="menu-icon" onerror="this.style.display='none';">
+            <span>복리후생</span>
+          </a>
+          <div class="mega-dropdown">
+            <div class="mega-dropdown-container">
+              <ul class="mega-menu-list">
+                <li><a href="welfare-point1.html">복지포인트 조회</a></li>
+                <li><a href="welfare-shop.html">상품 구매</a></li>
+                <li><a href="welfare-point2.html">포인트 관리</a></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- 4. 메인 콘텐츠 (드롭다운 + 급여 표) -->
+  <main class="main-container">
+    <div class="top-bar">
+      <select id="institutionSelect" class="select-box">
+        <!-- 동적으로 기관 목록 삽입 -->
+      </select>
+      
+      <div class="btn-group">
+        <button class="btn-search" onclick="fetchData()">조회</button>
+        <button class="btn">마감</button>
+        <button class="btn">제출</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>직급</th>
+            <th>성명(닉네임)</th>
+            <th>고유번호</th>
+            <th>기본급</th>
+            <th>수당</th>
+            <th>감액</th>
+            <th>공제</th>
+            <th>실수령액</th>
+          </tr>
+        </thead>
+        <tbody id="personTableBody">
+          <!-- 스크립트로 데이터 행 동적 생성 -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // 로그아웃
+    function handleLogout(e) {
+      if (e) e.preventDefault();
+      if (confirm('정말 로그아웃하시겠습니까?')) {
+        sessionStorage.removeItem('currentUser');
+        location.replace('login.html');
+      }
+    }
+
+    // 네비게이션 드롭다운 메뉴 토글
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentItem = this.parentElement;
+        document.querySelectorAll('.nav-item').forEach(item => {
+          if (item !== currentItem) item.classList.remove('active');
+        });
+        currentItem.classList.toggle('active');
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-item')) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      }
+    });
+
+    // --- 데이터 제어 ---
+
+    // 1. 드롭다운 기관 목록 (추가/수정 가능)
+    const institutions = [
+      "서울특별시청", 
+      "통영시청", 
+      "경상남도교육청", 
+      "서울중구청"
+    ];
+
+    // 2. 표 인원 데이터 (추가 시 행이 자동으로 증가합니다)
+    const personList = [
+      { rank: "팀장", name: "홍길동", id: "2026001", base: "3,500,000", allowance: "350,000", reduction: "0", deduction: "400,000", total: "3,450,000" },
+      { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "0", deduction: "300,000", total: "2,700,000" },
+      { rank: "사원", name: "이영희", id: "2026003", base: "2,400,000", allowance: "150,000", reduction: "50,000", deduction: "220,000", total: "2,280,000" }
+    ];
+
+    // 드롭다운 초기화
+    function initDropdown() {
+      const select = document.getElementById("institutionSelect");
+      select.innerHTML = "";
+      institutions.forEach(inst => {
+        const option = document.createElement("option");
+        option.value = inst;
+        option.textContent = inst;
+        select.appendChild(option);
+      });
+    }
+
+    // 표 데이터 출력
+    function renderTable(data) {
+      const tbody = document.getElementById("personTableBody");
+      tbody.innerHTML = "";
+
+      data.forEach(person => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${person.rank}</td>
+          <td>${person.name}</td>
+          <td>${person.id}</td>
+          <td>${person.base}</td>
+          <td>${person.allowance}</td>
+          <td>${person.reduction}</td>
+          <td>${person.deduction}</td>
+          <td>${person.total}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 조회 버튼 동작
+    function fetchData() {
+      const selectedInst = document.getElementById("institutionSelect").value;
+      renderTable(personList);
+    }
+
+    // 초기화
+    window.onload = function() {
+      initDropdown();
+      renderTable(personList);
+    };
+  </script>
+
+</body>
+</html>
