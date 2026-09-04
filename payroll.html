@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEOUL MY SOUL</title>
+  <title>SEOUL MY SOUL - 급여대장</title>
 
   <script>
   (function checkAuth() {
@@ -24,7 +24,7 @@
 
     body {
       font-family: 'Noto Sans KR', -apple-system, sans-serif;
-      background-color: #f0f2f5;
+      background-color: #f1f3f5;
       color: #333;
     }
 
@@ -63,7 +63,7 @@
     /* 2. 로고 및 유틸리티 영역 */
     .header-middle {
       background-color: #ffffff;
-      padding: 22px 0;
+      padding: 18px 0;
     }
 
     .header-middle-container {
@@ -95,7 +95,7 @@
       align-items: center;
       gap: 16px;
       list-style: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
     }
 
@@ -116,7 +116,7 @@
       background-color: #ffffff;
       border-top: 1px solid #f1f5f9;
       border-bottom: 2px solid #BFBFBF;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
       position: relative;
     }
 
@@ -126,7 +126,7 @@
       display: flex;
       align-items: center;
       padding: 0 20px;
-      height: 55px;
+      height: 50px;
     }
 
     .nav-menu {
@@ -145,28 +145,28 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 0 20px;
+      padding: 0 16px;
       height: 100%;
       text-decoration: none;
       color: #4a5568;
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
       cursor: pointer;
     }
 
     .menu-icon {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       object-fit: contain;
     }
 
     .nav-link:hover,
     .nav-item.active > .nav-link {
-      color: #4A5366;
+      color: #1e293b;
       background-color: #f8fafc;
-      border-bottom: 1px solid #BFBFBF;
+      border-bottom: 2px solid #334155;
     }
 
     .mega-dropdown {
@@ -179,7 +179,7 @@
       border-bottom: 1px solid #e2e8f0;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
       z-index: 1000;
-      padding: 25px 0;
+      padding: 20px 0;
     }
 
     .nav-item.active .mega-dropdown {
@@ -202,11 +202,11 @@
 
     .mega-menu-list li a {
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #4a5568;
       font-weight: 600;
       padding: 6px 12px;
-      border-radius: 6px;
+      border-radius: 4px;
       transition: all 0.2s;
     }
 
@@ -215,30 +215,59 @@
       background-color: #f1f5f9;
     }
 
-    /* 4. 메인 콘텐츠 영역 (급여/보수 관리 영역) */
+    /* 4. 메인 콘텐츠 영역 (급여 대장 문서 스타일) */
     .main-container {
       max-width: 1280px;
-      margin: 30px auto;
-      padding: 30px;
+      margin: 24px auto;
+      padding: 28px 32px;
       background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #cbd5e1;
+      border-radius: 4px; /* 각진 테두리 서식 느낌 */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* 상단 컨트롤 영역 */
+    .doc-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* 상단 컨트롤 바 */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      margin-bottom: 16px;
+      background-color: #f8fafc;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    .select-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #334155;
     }
 
     .select-box {
-      padding: 8px 12px;
-      font-size: 14px;
+      padding: 6px 10px;
+      font-size: 0.88rem;
       border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      min-width: 220px;
+      border-radius: 4px;
+      min-width: 200px;
       outline: none;
       background-color: #fff;
     }
@@ -250,75 +279,113 @@
     .btn-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    /* 요청된 조회 버튼 스타일 */
+    /* 조회 버튼 스타일 */
     .btn-search {
-      padding: 5px 12px;
+      padding: 5px 14px;
       font-size: 13px;
       font-weight: 600;
       color: #ffffff;
       background-color: #4c75f2;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(76, 117, 242, 0.25);
-      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(76, 117, 242, 0.2);
+      transition: all 0.15s ease;
     }
 
     .btn-search:hover {
       background-color: #3b62e0;
-      transform: translateY(-1px);
     }
 
-    /* 일반 버튼 스타일 (마감, 제출 등) */
+    /* 일반 버튼 스타일 (마감, 제출) */
     .btn {
-      padding: 5px 12px;
+      padding: 5px 14px;
       font-size: 13px;
       font-weight: 600;
       color: #ffffff;
       background-color: #64748b;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
-    .btn:hover {
+    .btn:hover:not(:disabled) {
       background-color: #475569;
     }
 
-    /* 표 스타일링 */
+    /* 비활성화 버튼 스타일 */
+    .btn:disabled {
+      background-color: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* 표 스타일링 (보수 대장 문서 스타일) */
     .table-wrapper {
       overflow-x: auto;
+      border-top: 2px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: center;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     th, td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
     }
 
     th {
-      background-color: #f8fafc;
-      font-weight: 700;
-      color: #334155;
-      border-top: 2px solid #cbd5e1;
-    }
-
-    td {
-      color: #475569;
-    }
-
-    tr:hover {
       background-color: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* 열 폭 지정 및 실수령액 강조 */
+    .col-rank { width: 90px; }       /* 직급 폭 축소 */
+    .col-id { width: 110px; }        /* 고유번호 폭 축소 */
+    
+    .col-netpay {
+      background-color: #f0f7ff;    /* 강조를 위한 연한 블루 배경 */
+      font-weight: 800;
+      color: #1d4ed8;               /* 강조 색상 */
+      text-align: right;
+    }
+
+    th.col-netpay {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    tr:hover td.col-netpay {
+      background-color: #e0f2fe;
+    }
+
+    /* 하단 안내 문구 */
+    .notice-text {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #d97706; /* 경고 느낌의 아쿠아/주황 톤 */
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
   </style>
 </head>
@@ -336,7 +403,7 @@
   <div class="header-middle">
     <div class="header-middle-container">
       <div class="brand-logo">
-        <a href="index.html">
+        <a href="#">
           <img src="home.png" alt="SEOUL MY SOUL" onerror="this.style.display='none';">
         </a>
       </div>
@@ -368,7 +435,7 @@
           </div>
         </li>
 
-        <li class="nav-item">
+        <li class="nav-item active">
           <a href="#" class="nav-link">
             <img src="pay.png" alt="" class="menu-icon" onerror="this.style.display='none';">
             <span>보수관리</span>
@@ -422,16 +489,23 @@
     </div>
   </header>
 
-  <!-- 4. 메인 콘텐츠 (드롭다운 + 급여 표) -->
+  <!-- 4. 메인 콘텐츠 (급여대장 서식) -->
   <main class="main-container">
+    <div class="doc-title">
+      <span>기관별 급여대장</span>
+    </div>
+
     <div class="top-bar">
-      <select id="institutionSelect" class="select-box">
-        <!-- 동적으로 기관 목록 삽입 -->
-      </select>
+      <div class="select-group">
+        <label for="institutionSelect" class="select-label">소속 기관:</label>
+        <select id="institutionSelect" class="select-box">
+          <!-- 동적으로 기관 목록 삽입 -->
+        </select>
+      </div>
       
       <div class="btn-group">
-        <button class="btn-search" onclick="fetchData()">조회</button>
-        <button class="btn">마감</button>
+        <button class="btn-search" onclick="handleSearch()">조회</button>
+        <button id="btnClose" class="btn" onclick="handleCloseProcess()" disabled>마감</button>
         <button class="btn">제출</button>
       </div>
     </div>
@@ -440,20 +514,29 @@
       <table>
         <thead>
           <tr>
-            <th>직급</th>
+            <th class="col-rank">직급</th>
             <th>성명(닉네임)</th>
-            <th>고유번호</th>
+            <th class="col-id">고유번호</th>
             <th>기본급</th>
             <th>수당</th>
             <th>감액</th>
             <th>공제</th>
-            <th>실수령액</th>
+            <th class="col-netpay">실수령액</th>
           </tr>
         </thead>
         <tbody id="personTableBody">
-          <!-- 스크립트로 데이터 행 동적 생성 -->
+          <tr>
+            <td colspan="8" style="padding: 30px 0; color: #94a3b8;">
+              상단 기관을 선택한 후 [조회] 버튼을 눌러주세요.
+            </td>
+          </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- 하단 안내 문구 -->
+    <div class="notice-text">
+      <span>※ 내용에 오류가 없는지 충분히 확인한 후 마감하시기 바랍니다.</span>
     </div>
   </main>
 
@@ -485,9 +568,11 @@
       }
     });
 
-    // --- 데이터 제어 ---
+    // ==========================================
+    // --- DB 연동 세팅 및 데이터 제어 ---
+    // ==========================================
 
-    // 1. 드롭다운 기관 목록 (추가/수정 가능)
+    // 1. 초기 기관 선택 옵션 목록
     const institutions = [
       "서울특별시청", 
       "통영시청", 
@@ -495,14 +580,40 @@
       "서울중구청"
     ];
 
-    // 2. 표 인원 데이터 (추가 시 행이 자동으로 증가합니다)
-    const personList = [
-      { rank: "팀장", name: "홍길동", id: "2026001", base: "3,500,000", allowance: "350,000", reduction: "0", deduction: "400,000", total: "3,450,000" },
-      { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "0", deduction: "300,000", total: "2,700,000" },
-      { rank: "사원", name: "이영희", id: "2026003", base: "2,400,000", allowance: "150,000", reduction: "50,000", deduction: "220,000", total: "2,280,000" }
-    ];
+    // DB 구축 전 시뮬레이션 데이터 (실제 DB 연결 시 백엔드에서 받아옴)
+    const mockDbData = {
+      "서울특별시청": [
+        { rank: "팀장", name: "홍길동", id: "2026001", base: "3,500,000", allowance: "350,000", reduction: "0", deduction: "400,000", total: "3,450,000" },
+        { rank: "주무관", name: "김철수", id: "2026002", base: "2,800,000", allowance: "200,000", reduction: "0", deduction: "300,000", total: "2,700,000" }
+      ],
+      "통영시청": [
+        { rank: "과장", name: "이순신", id: "2026101", base: "4,200,000", allowance: "500,000", reduction: "0", deduction: "550,000", total: "4,150,000" },
+        { rank: "사원", name: "이영희", id: "2026102", base: "2,400,000", allowance: "150,000", reduction: "50,000", deduction: "220,000", total: "2,280,000" }
+      ]
+    };
 
-    // 드롭다운 초기화
+    // 2. [DB 호출 세팅] 실제 데이터베이스 통신 함수 (추후 fetch API로 교체)
+    async function fetchSalariesFromDB(selectedInstitution) {
+      /*
+      // [DB 연동 시 적용할 실제 코드 샘플]
+      try {
+        const response = await fetch(`/api/salaries?institution=${encodeURIComponent(selectedInstitution)}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+      } catch (error) {
+        console.error('DB Fetch Error:', error);
+        alert('데이터를 가져오는 중 오류가 발생했습니다.');
+        return [];
+      }
+      */
+
+      // DB 연동 전 가상 통신 처리
+      return mockDbData[selectedInstitution] || [
+        { rank: "주무관", name: "박지성", id: "2026999", base: "3,000,000", allowance: "250,000", reduction: "0", deduction: "350,000", total: "2,900,000" }
+      ];
+    }
+
+    // 드롭다운 옵션 바인딩
     function initDropdown() {
       const select = document.getElementById("institutionSelect");
       select.innerHTML = "";
@@ -514,37 +625,68 @@
       });
     }
 
-    // 표 데이터 출력
+    // 3. [조회 버튼 클릭] 동작
+    async function handleSearch() {
+      const selectedInst = document.getElementById("institutionSelect").value;
+      
+      // DB에서 해당 기관의 급여 내역 조회
+      const data = await fetchSalariesFromDB(selectedInst);
+      
+      // 표 화면 갱신
+      renderTable(data);
+
+      // 마감 버튼 활성화
+      const btnClose = document.getElementById("btnClose");
+      btnClose.disabled = false;
+    }
+
+    // 표 데이터 렌더링
     function renderTable(data) {
       const tbody = document.getElementById("personTableBody");
       tbody.innerHTML = "";
 
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="padding: 20px 0;">조회된 데이터가 없습니다.</td></tr>`;
+        return;
+      }
+
       data.forEach(person => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${person.rank}</td>
+          <td class="col-rank">${person.rank}</td>
           <td>${person.name}</td>
-          <td>${person.id}</td>
-          <td>${person.base}</td>
-          <td>${person.allowance}</td>
-          <td>${person.reduction}</td>
-          <td>${person.deduction}</td>
-          <td>${person.total}</td>
+          <td class="col-id">${person.id}</td>
+          <td class="text-right">${person.base}</td>
+          <td class="text-right">${person.allowance}</td>
+          <td class="text-right">${person.reduction}</td>
+          <td class="text-right">${person.deduction}</td>
+          <td class="col-netpay">${person.total}</td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // 조회 버튼 동작
-    function fetchData() {
-      const selectedInst = document.getElementById("institutionSelect").value;
-      renderTable(personList);
+    // 4. [마감 버튼 클릭] 승인 프로세스 함수
+    function handleCloseProcess() {
+      const confirmMessage = "소속 기관의 장의 승인을 받으면 자동으로 마감됩니다. 마감된 후에는 수정할 수 없습니다. 마감하시겠습니까?";
+      
+      // 1차 확인창
+      if (confirm(confirmMessage)) {
+        // '확인' 클릭 시 승인 요청 안내
+        alert("소속 기관의 장에게 승인을 요청하였습니다.");
+        
+        // 추가 처리 시 : 마감 버튼 비활성화 또는 상태 변경 코드
+        // document.getElementById("btnClose").innerText = "승인대기";
+        // document.getElementById("btnClose").disabled = true;
+      } else {
+        // '취소' 클릭 시 작동 안함
+        console.log("마감 요청 취소됨");
+      }
     }
 
-    // 초기화
+    // 페이지 로드 시 초기화
     window.onload = function() {
       initDropdown();
-      renderTable(personList);
     };
   </script>
 
