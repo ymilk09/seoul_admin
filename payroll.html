@@ -255,7 +255,6 @@
       gap: 10px;
     }
 
-    /* [요청 1 반영] '소속 기관:' -> '소속 기관' */
     .select-label {
       font-size: 0.9rem;
       font-weight: 700;
@@ -587,22 +586,14 @@
     // --- 비즈니스 로직 및 접근 권한 설정 ---
     const institutions = [
       "서울특별시청", 
-      "서울소방서", 
-      "서울경찰청", 
-      "통영시청", 
-      "경상남도교육청", 
-      "서울중구청"
+      "서울특별시경찰청", 
+      "서울특별시소방재난본부"
     ];
 
     // [요청 5 반영] 사용자/직책별 지정 소속기관 매핑 (예시)
-    // - admin: 메인 관리자 (모든 기관 조회 가능)
-    // - fire_chief: 서울소방서장 (서울소방서만 조회 가능)
-    // - police_chief: 서울경찰서장 (서울경찰청만 조회 가능)
     const userPermissions = {
-      "admin": "ALL",
-      "fire_chief": "서울소방서",
-      "police_chief": "서울경찰청",
-      "tongyeong_user": "통영시청"
+      "kooti200@naver.com": "ALL",
+      "wonkyun0314@naver.com": "서울특별시경찰청"
     };
 
     const mockDbData = {
