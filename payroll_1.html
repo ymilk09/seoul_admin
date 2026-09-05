@@ -402,6 +402,11 @@
     .input-table-cell:focus {
       border-color: #5b73e8;
     }
+    .input-table-cell:disabled {
+      background-color: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
 
     .th-checkbox-label {
       cursor: pointer;
@@ -591,7 +596,7 @@
     <div id="targetTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect1" class="select-box"></select>
+          <select id="institutionSelect1" class="select-box" onchange="handleSearchTarget()"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchTarget()">조회</button>
@@ -631,7 +636,7 @@
     <div id="allowanceTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect2" class="select-box"></select>
+          <select id="institutionSelect2" class="select-box" onchange="handleSearchAllowance()"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchAllowance()">조회</button>
@@ -680,7 +685,7 @@
     <div id="reductionTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect3" class="select-box"></select>
+          <select id="institutionSelect3" class="select-box" onchange="handleSearchReduction()"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchReduction()">조회</button>
@@ -725,7 +730,7 @@
     <div id="closeTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect4" class="select-box"></select>
+          <select id="institutionSelect4" class="select-box" onchange="handleSearchClose()"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchClose()">조회</button>
@@ -890,26 +895,31 @@
       }
 
       const alreadyExists = createdFiles.some(f => f.institution === selectedValue);
-      if (alreadyExists) {
-        alert("이미 해당 기관의 급여대장 파일이 생성되어 있습니다.");
-        return;
+      if (!alreadyExists) {
+        const fileName = `${year}년 ${month}월 ${selectedValue} 공무원 급여대장`;
+        createdFiles.push({
+          institution: selectedValue,
+          fileName: fileName,
+          year: year,
+          month: month
+        });
+        updateCreatedFileDropdowns();
       }
 
-      const fileName = `${year}년 ${month}월 ${selectedValue} 공무원 급여대장`;
-      createdFiles.push({
-        institution: selectedValue,
-        fileName: fileName,
-        year: year,
-        month: month
-      });
-
-      updateCreatedFileDropdowns();
+      document.getElementById("institutionSelect1").value = selectedValue;
+      document.getElementById("institutionSelect2").value = selectedValue;
+      document.getElementById("institutionSelect3").value = selectedValue;
+      document.getElementById("institutionSelect4").value = selectedValue;
 
       alert("급여대장 파일이 생성되었습니다. [대상자 선정] 탭으로 이동합니다.");
 
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
-      document.getElementById("institutionSelect1").value = selectedValue;
+      
+      handleSearchTarget();
+      handleSearchAllowance();
+      handleSearchReduction();
+      handleSearchClose();
     }
 
     function switchTab(tabId, btn) {
@@ -918,14 +928,23 @@
 
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+
+      const activeInst1 = document.getElementById("institutionSelect1").value;
+      if (tabId === 'targetTab' && activeInst1) handleSearchTarget();
+
+      const activeInst2 = document.getElementById("institutionSelect2").value;
+      if (tabId === 'allowanceTab' && activeInst2) handleSearchAllowance();
+
+      const activeInst3 = document.getElementById("institutionSelect3").value;
+      if (tabId === 'reductionTab' && activeInst3) handleSearchReduction();
+
+      const activeInst4 = document.getElementById("institutionSelect4").value;
+      if (tabId === 'closeTab' && activeInst4) handleSearchClose();
     }
 
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
-      if (!selectedInst) {
-        alert("생성된 파일을 선택하세요.");
-        return;
-      }
+      if (!selectedInst) return;
       const data = mockTargetData[selectedInst] || [];
       renderTargetTable(data);
       document.getElementById("btnSaveTarget").disabled = false;
@@ -952,6 +971,7 @@
         `;
         tbody.appendChild(row);
       });
+      updateSelectAllStatus();
     }
 
     function updateTargetStatus(index, isChecked) {
@@ -990,16 +1010,9 @@
 
     function handleSearchAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
-      if (!selectedInst) {
-        alert("생성된 파일을 선택하세요.");
-        return;
-      }
+      if (!selectedInst) return;
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
-
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById(`masterAllowance${i}`).checked = false;
-      }
       renderAllowanceTable(filteredData);
       document.getElementById("btnSaveAllowance").disabled = false;
     }
@@ -1021,25 +1034,25 @@
           <td class="col-allowance">
             <div class="allowance-cell-container">
               <input type="checkbox" class="checkbox-custom allowance-cb-1" ${item.allowances[1].chk ? 'checked' : ''} onchange="updateAllowanceCheck('${item.id}', 1, this.checked)">
-              <input type="text" class="input-table-cell" value="${item.allowances[1].val}" placeholder="금액" oninput="updateAllowanceValue('${item.id}', 1, this.value)">
+              <input type="text" class="input-table-cell input-allowance-1-${item.id}" value="${item.allowances[1].val}" placeholder="금액" ${item.allowances[1].chk ? '' : 'disabled'} oninput="updateAllowanceValue('${item.id}', 1, this.value)">
             </div>
           </td>
           <td class="col-allowance">
             <div class="allowance-cell-container">
               <input type="checkbox" class="checkbox-custom allowance-cb-2" ${item.allowances[2].chk ? 'checked' : ''} onchange="updateAllowanceCheck('${item.id}', 2, this.checked)">
-              <input type="text" class="input-table-cell" value="${item.allowances[2].val}" placeholder="금액" oninput="updateAllowanceValue('${item.id}', 2, this.value)">
+              <input type="text" class="input-table-cell input-allowance-2-${item.id}" value="${item.allowances[2].val}" placeholder="금액" ${item.allowances[2].chk ? '' : 'disabled'} oninput="updateAllowanceValue('${item.id}', 2, this.value)">
             </div>
           </td>
           <td class="col-allowance">
             <div class="allowance-cell-container">
               <input type="checkbox" class="checkbox-custom allowance-cb-3" ${item.allowances[3].chk ? 'checked' : ''} onchange="updateAllowanceCheck('${item.id}', 3, this.checked)">
-              <input type="text" class="input-table-cell" value="${item.allowances[3].val}" placeholder="금액" oninput="updateAllowanceValue('${item.id}', 3, this.value)">
+              <input type="text" class="input-table-cell input-allowance-3-${item.id}" value="${item.allowances[3].val}" placeholder="금액" ${item.allowances[3].chk ? '' : 'disabled'} oninput="updateAllowanceValue('${item.id}', 3, this.value)">
             </div>
           </td>
           <td class="col-allowance">
             <div class="allowance-cell-container">
               <input type="checkbox" class="checkbox-custom allowance-cb-4" ${item.allowances[4].chk ? 'checked' : ''} onchange="updateAllowanceCheck('${item.id}', 4, this.checked)">
-              <input type="text" class="input-table-cell" value="${item.allowances[4].val}" placeholder="금액" oninput="updateAllowanceValue('${item.id}', 4, this.value)">
+              <input type="text" class="input-table-cell input-allowance-4-${item.id}" value="${item.allowances[4].val}" placeholder="금액" ${item.allowances[4].chk ? '' : 'disabled'} oninput="updateAllowanceValue('${item.id}', 4, this.value)">
             </div>
           </td>
         `;
@@ -1053,6 +1066,19 @@
         const target = mockTargetData[selectedInst].find(item => item.id === id);
         if (target) {
           target.allowances[colNum].chk = isChecked;
+          const inputEl = document.querySelector(`.input-allowance-${colNum}-${id}`);
+          if (isChecked) {
+            if (!target.allowances[colNum].val) {
+              const defaultValues = {1: "150,000", 2: "200,000", 3: "100,000", 4: "250,000"};
+              target.allowances[colNum].val = defaultValues[colNum] || "100,000";
+            }
+            inputEl.value = target.allowances[colNum].val;
+            inputEl.disabled = false;
+          } else {
+            target.allowances[colNum].val = "";
+            inputEl.value = "";
+            inputEl.disabled = true;
+          }
         }
       }
     }
@@ -1068,11 +1094,23 @@
     }
 
     function toggleAllowanceColumn(colNum, masterCb) {
-      const checkboxes = document.querySelectorAll(`.allowance-cb-${colNum}`);
-      checkboxes.forEach(cb => {
-        cb.checked = masterCb.checked;
-        cb.dispatchEvent(new Event('change'));
+      const selectedInst = document.getElementById("institutionSelect2").value;
+      if (!selectedInst) return;
+      const allData = mockTargetData[selectedInst] || [];
+      allData.forEach(item => {
+        if (item.isTarget) {
+          item.allowances[colNum].chk = masterCb.checked;
+          if (masterCb.checked) {
+            if (!item.allowances[colNum].val) {
+              const defaultValues = {1: "150,000", 2: "200,000", 3: "100,000", 4: "250,000"};
+              item.allowances[colNum].val = defaultValues[colNum] || "100,000";
+            }
+          } else {
+            item.allowances[colNum].val = "";
+          }
+        }
       });
+      handleSearchAllowance();
     }
 
     function handleSaveAllowance() {
@@ -1081,16 +1119,9 @@
 
     function handleSearchReduction() {
       const selectedInst = document.getElementById("institutionSelect3").value;
-      if (!selectedInst) {
-        alert("생성된 파일을 선택하세요.");
-        return;
-      }
+      if (!selectedInst) return;
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
-
-      for (let i = 1; i <= 3; i++) {
-        document.getElementById(`masterReduction${i}`).checked = false;
-      }
       renderReductionTable(filteredData);
       document.getElementById("btnSaveReduction").disabled = false;
     }
@@ -1141,10 +1172,7 @@
 
     function handleSearchClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
-      if (!selectedInst) {
-        alert("생성된 파일을 선택하세요.");
-        return;
-      }
+      if (!selectedInst) return;
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
       renderCloseTable(filteredData);
