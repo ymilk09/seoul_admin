@@ -926,18 +926,6 @@
 
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
-
-      const activeInst1 = document.getElementById("institutionSelect1").value;
-      if (tabId === 'targetTab' && activeInst1) handleSearchTarget();
-
-      const activeInst2 = document.getElementById("institutionSelect2").value;
-      if (tabId === 'allowanceTab' && activeInst2) handleSearchAllowance();
-
-      const activeInst3 = document.getElementById("institutionSelect3").value;
-      if (tabId === 'reductionTab' && activeInst3) handleSearchReduction();
-
-      const activeInst4 = document.getElementById("institutionSelect4").value;
-      if (tabId === 'closeTab' && activeInst4) handleSearchClose();
     }
 
     function handleSearchTarget() {
