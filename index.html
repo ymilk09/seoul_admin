@@ -513,22 +513,28 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // 메뉴 클릭 시 드롭다운 토글 기능
+// 메뉴 클릭 시 드롭다운 토글 및 링크 이동 처리
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
-        e.preventDefault(); // 기본 이동 동작 방지
-        
-        const currentItem = this.parentElement;
-        
-        // 다른 열려있는 메뉴 닫기
-        document.querySelectorAll('.nav-item').forEach(item => {
-          if (item !== currentItem) {
-            item.classList.remove('active');
-          }
-        });
-        
-        // 현재 선택한 메뉴 토글 (열기/닫기)
-        currentItem.classList.toggle('active');
+        const href = this.getAttribute('href');
+
+        // href가 '#'이거나 없으면 기본 이동을 막고 드롭다운 토글 실행
+        if (!href || href === '#') {
+          e.preventDefault(); 
+          
+          const currentItem = this.parentElement;
+          
+          // 다른 열려있는 메뉴 닫기
+          document.querySelectorAll('.nav-item').forEach(item => {
+            if (item !== currentItem) {
+              item.classList.remove('active');
+            }
+          });
+          
+          // 현재 선택한 메뉴 토글 (열기/닫기)
+          currentItem.classList.toggle('active');
+        }
+        // href가 'approval.html'처럼 실제 경로인 경우 e.preventDefault()가 실행되지 않아 페이지가 정상적으로 이동합니다.
       });
     });
 
