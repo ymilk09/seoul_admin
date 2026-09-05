@@ -559,39 +559,39 @@
 
   <main class="main-container">
     <div class="tab-menu">
-      <button class="tab-btn active" onclick="switchTab('fileCreateTab', this)">파일 생성</button>
+      <button class="tab-btn active" onclick="switchTab('fileCreateTab', this)">자료 생성</button>
       <button class="tab-btn" onclick="switchTab('targetTab', this)">대상자 선정</button>
       <button class="tab-btn" onclick="switchTab('allowanceTab', this)">수당처리</button>
       <button class="tab-btn" onclick="switchTab('reductionTab', this)">감액처리</button>
       <button class="tab-btn" onclick="switchTab('closeTab', this)">마감</button>
     </div>
 
-    <!-- 1. 파일 생성 탭 -->
+    <!-- 1. 자료 생성 탭 -->
     <div id="fileCreateTab" class="tab-content active">
       <div class="file-create-wrapper">
         <div class="file-create-row">
-          <label class="file-create-label">급여 작업 기관</label>
+          <label class="file-create-label">선택기관</label>
           <select id="fileCreateInstSelect" class="file-create-input" style="flex: 1;"></select>
         </div>
         <div class="file-create-row">
-          <label class="file-create-label">작성 기간</label>
+          <label class="file-create-label">급여년월</label>
           <div style="display: flex; align-items: center; gap: 6px;">
-            <input type="text" id="inputYear" class="file-create-input" style="width: 80px; text-align: center;" value="2026"> 년 
-            <input type="text" id="inputMonth" class="file-create-input" style="width: 60px; text-align: center;" value="08"> 월 급여대장 작성
+            <input type="text" id="inputYear" class="file-create-input" style="width: 80px; text-align: center;" value=" "> 년 
+            <input type="text" id="inputMonth" class="file-create-input" style="width: 60px; text-align: center;" value=" "> 월 공무원 급여대장
           </div>
         </div>
         <div class="file-create-row">
-          <label class="file-create-label">소속 기관장</label>
+          <label class="file-create-label">소속 기관의 장</label>
           <input type="text" id="inputBossName" class="file-create-input" style="flex: 1;" placeholder="성명 입력">
-          <input type="text" id="inputBossPhone" class="file-create-input" style="flex: 1;" placeholder="연락처 입력">
+          <input type="text" id="inputBossPhone" class="file-create-input" style="flex: 1;" placeholder="디스코드 연락처 입력">
         </div>
         <div class="file-create-row">
           <label class="file-create-label">급여 담당자</label>
-          <input type="text" id="inputMyName" class="file-create-input" style="flex: 1;" placeholder="담당자 성명 입력">
-          <input type="text" id="inputMyPhone" class="file-create-input" style="flex: 1;" placeholder="담당자 연락처 입력">
+          <input type="text" id="inputMyName" class="file-create-input" style="flex: 1;" placeholder="성명 입력">
+          <input type="text" id="inputMyPhone" class="file-create-input" style="flex: 1;" placeholder="디스코드 연락처 입력">
         </div>
         <div style="margin-top: 10px;">
-          <button class="btn-action" onclick="handleFileCreateStart()">시작</button>
+          <button class="btn-action" onclick="handleFileCreateStart()">자료생성</button>
         </div>
       </div>
     </div>
@@ -628,7 +628,7 @@
           <tbody id="targetTableBody">
             <tr>
               <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                생성된 파일을 선택한 후 [조회] 버튼을 눌러주세요.
+                생성된 자료을 선택한 후 [조회] 버튼을 눌러주세요.
               </td>
             </tr>
           </tbody>
@@ -677,7 +677,7 @@
           <tbody id="allowanceTableBody">
             <tr>
               <td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
+                생성된 자료 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -722,7 +722,7 @@
           <tbody id="reductionTableBody">
             <tr>
               <td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
+                생성된 자료 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -753,7 +753,7 @@
           <tbody id="closeTableBody">
             <tr>
               <td colspan="2" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                생성된 파일 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.
+                생성된 자료 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.
               </td>
             </tr>
           </tbody>
@@ -802,7 +802,7 @@
 
     let createdFiles = [];
 
-    // 각 기관별 상태 객체 (파일생성, 대상자저장여부, 수당저장여부, 감액저장여부, 마감여부)
+    // 각 기관별 상태 객체 (자료생성, 대상자저장여부, 수당저장여부, 감액저장여부, 마감여부)
     let workflowStatus = {};
 
     const mockTargetData = {
@@ -852,7 +852,7 @@
         select.innerHTML = "";
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = createdFiles.length === 0 ? "생성된 파일이 없습니다" : "생성된 파일을 선택하세요";
+        defaultOption.textContent = createdFiles.length === 0 ? "생성된 자료가 없습니다" : "생성된 자료를 선택하세요";
         defaultOption.disabled = true;
         defaultOption.selected = true;
         select.appendChild(defaultOption);
@@ -925,7 +925,7 @@
       document.getElementById("institutionSelect3").value = selectedValue;
       document.getElementById("institutionSelect4").value = selectedValue;
 
-      alert("급여대장 파일이 생성되었습니다. [대상자 선정] 탭으로 이동합니다.");
+      alert("자료가 생성되었습니다. [대상자 선정] 탭으로 이동합니다.");
 
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
@@ -939,16 +939,16 @@
       document.getElementById(tabId).classList.add('active');
 
       if (tabId === 'targetTab') {
-        document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일을 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
+        document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 자료를 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
         document.getElementById("btnSaveTarget").disabled = true;
       } else if (tabId === 'allowanceTab') {
-        document.getElementById("allowanceTableBody").innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("allowanceTableBody").innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 자료 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
         document.getElementById("btnSaveAllowance").disabled = true;
       } else if (tabId === 'reductionTab') {
-        document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 자료 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
         document.getElementById("btnSaveReduction").disabled = true;
       } else if (tabId === 'closeTab') {
-        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="2" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.</td></tr>`;
+        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="2" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 자료 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.</td></tr>`;
         document.getElementById("btnCloseAction").disabled = true;
       }
     }
@@ -956,7 +956,7 @@
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
       if (!selectedInst) {
-        alert("파일을 먼저 선택해주세요.");
+        alert("자료를 먼저 선택해주세요.");
         return;
       }
       const data = mockTargetData[selectedInst] || [];
@@ -1029,7 +1029,7 @@
     function handleSearchAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
       if (!selectedInst) {
-        alert("파일을 먼저 선택해주세요.");
+        alert("자료를 먼저 선택해주세요.");
         return;
       }
       const allData = mockTargetData[selectedInst] || [];
@@ -1145,7 +1145,7 @@
     function handleSearchReduction() {
       const selectedInst = document.getElementById("institutionSelect3").value;
       if (!selectedInst) {
-        alert("파일을 먼저 선택해주세요.");
+        alert("자료를 먼저 선택해주세요.");
         return;
       }
       const allData = mockTargetData[selectedInst] || [];
@@ -1205,7 +1205,7 @@
     function handleSearchClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) {
-        alert("파일을 먼저 선택해주세요.");
+        alert("자료를 먼저 선택해주세요.");
         return;
       }
       renderCloseStatusTable(selectedInst);
@@ -1228,7 +1228,7 @@
       };
 
       const steps = [
-        { name: "1. 파일 생성", done: status.fileCreated, desc: status.fileCreated ? "파일 생성 완료" : "미생성" },
+        { name: "1. 자료 생성", done: status.fileCreated, desc: status.fileCreated ? "자료 생성 완료" : "미생성" },
         { name: "2. 대상자 선정", done: status.targetSaved, desc: status.targetSaved ? "대상자 선정 저장 완료" : "미저장" },
         { name: "3. 수당 처리", done: status.allowanceSaved, desc: status.allowanceSaved ? "수당 처리 저장 완료" : "미저장" },
         { name: "4. 감액 처리", done: status.reductionSaved, desc: status.reductionSaved ? "감액 처리 저장 완료" : "미저장" },
