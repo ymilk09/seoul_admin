@@ -919,7 +919,7 @@
       document.getElementById("institutionSelect3").value = selectedValue;
       document.getElementById("institutionSelect4").value = selectedValue;
 
-      alert("급여대장 파일이 생성되었습니다. [대상자 선정] 탭으로 이동합니다.");
+      alert("자료가 생성되었습니다.");
 
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
@@ -1015,13 +1015,13 @@
     function handleSaveTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
       if (selectedInst && workflowStatus[selectedInst] && workflowStatus[selectedInst].isClosed) {
-        alert("이미 마감되었으니 저장할 수 없습니다.");
+        alert("이미 마감되어 저장할 수 없습니다.");
         return;
       }
       if (workflowStatus[selectedInst]) {
         workflowStatus[selectedInst].targetSaved = true;
       }
-      alert("대상자 선정 내용이 저장되었습니다.");
+      alert("저장되었습니다.");
     }
 
     function handleSearchAllowance() {
@@ -1135,13 +1135,13 @@
     function handleSaveAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
       if (selectedInst && workflowStatus[selectedInst] && workflowStatus[selectedInst].isClosed) {
-        alert("이미 마감되었으니 저장할 수 없습니다.");
+        alert("이미 마감되어 저장할 수 없습니다.");
         return;
       }
       if (workflowStatus[selectedInst]) {
         workflowStatus[selectedInst].allowanceSaved = true;
       }
-      alert("수당처리가 저장되었습니다.");
+      alert("저장되었습니다.");
     }
 
     function handleSearchReduction() {
@@ -1199,13 +1199,13 @@
     function handleSaveReduction() {
       const selectedInst = document.getElementById("institutionSelect3").value;
       if (selectedInst && workflowStatus[selectedInst] && workflowStatus[selectedInst].isClosed) {
-        alert("이미 마감되었으니 저장할 수 없습니다.");
+        alert("이미 마감되어 수정할 수 없습니다.");
         return;
       }
       if (workflowStatus[selectedInst]) {
         workflowStatus[selectedInst].reductionSaved = true;
       }
-      alert("감액처리가 저장되었습니다.");
+      alert("저장되었습니다.");
     }
 
     function handleSearchClose() {
@@ -1277,14 +1277,14 @@
 
       const status = workflowStatus[selectedInst];
       if (!status || !status.targetSaved || !status.allowanceSaved || !status.reductionSaved) {
-        alert("모든 데이터(대상자 선정, 수당 처리, 감액 처리)를 저장해야 마감할 수 있습니다.");
+        alert("저장되지 않은 자료가 있습니다.");
         return;
       }
 
       const confirmMessage = "마감하시겠습니까?";
       if (confirm(confirmMessage)) {
         workflowStatus[selectedInst].isClosed = true;
-        alert("마감되었습니다. 급여대장 제출 메뉴로 이동해 최종 마감하시기 바랍니다.");
+        alert("마감되었습니다. [급여대장 제출 메뉴]로 이동해 최종 마감하시기 바랍니다.");
         handleSearchClose();
       }
     }
