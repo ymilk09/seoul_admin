@@ -566,25 +566,25 @@
     <div id="fileCreateTab" class="tab-content active">
       <div class="file-create-wrapper">
         <div class="file-create-row">
-          <label class="file-create-label">급여 작업 기관</label>
+          <label class="file-create-label">선택기관</label>
           <select id="fileCreateInstSelect" class="file-create-input" style="flex: 1;"></select>
         </div>
         <div class="file-create-row">
-          <label class="file-create-label">작성 기간</label>
+          <label class="file-create-label">급여년월</label>
           <div style="display: flex; align-items: center; gap: 6px;">
-            <input type="text" id="inputYear" class="file-create-input" style="width: 80px; text-align: center;" value="2026"> 년 
-            <input type="text" id="inputMonth" class="file-create-input" style="width: 60px; text-align: center;" value="08"> 월 급여대장 작성
+            <input type="text" id="inputYear" class="file-create-input" style="width: 80px; text-align: center;" value="2027"> 년 
+            <input type="text" id="inputMonth" class="file-create-input" style="width: 60px; text-align: center;" value="0"> 월 급여대장 작성
           </div>
         </div>
         <div class="file-create-row">
-          <label class="file-create-label">소속 기관장</label>
+          <label class="file-create-label">보수지급기관의 장</label>
           <input type="text" id="inputBossName" class="file-create-input" style="flex: 1;" placeholder="성명 입력">
-          <input type="text" id="inputBossPhone" class="file-create-input" style="flex: 1;" placeholder="연락처 입력">
+          <input type="text" id="inputBossPhone" class="file-create-input" style="flex: 1;" placeholder="디스코드 입력">
         </div>
         <div class="file-create-row">
-          <label class="file-create-label">급여 담당자</label>
-          <input type="text" id="inputMyName" class="file-create-input" style="flex: 1;" placeholder="담당자 성명 입력">
-          <input type="text" id="inputMyPhone" class="file-create-input" style="flex: 1;" placeholder="담당자 연락처 입력">
+          <label class="file-create-label">보수지급 담당자</label>
+          <input type="text" id="inputMyName" class="file-create-input" style="flex: 1;" placeholder="성명 입력">
+          <input type="text" id="inputMyPhone" class="file-create-input" style="flex: 1;" placeholder="디스코드 연락처 입력">
         </div>
         <div style="margin-top: 10px;">
           <button class="btn-action" onclick="handleFileCreateStart()">시작</button>
