@@ -383,6 +383,19 @@
       vertical-align: middle;
     }
 
+    .input-table-cell {
+      width: 90%;
+      padding: 4px;
+      font-size: 0.85rem;
+      text-align: right;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      outline: none;
+    }
+    .input-table-cell:focus {
+      border-color: #5b73e8;
+    }
+
     .th-checkbox-label {
       cursor: pointer;
       display: inline-flex;
@@ -627,22 +640,10 @@
               <th class="col-name">성명</th>
               <th class="col-id">고유번호</th>
               <th class="col-rank">직급</th>
-              <th class="col-allowance">
-                <div>수당1</div>
-                <div><input type="checkbox" id="masterAllowance1" class="checkbox-custom" onclick="toggleAllowanceColumn(1, this)"></div>
-              </th>
-              <th class="col-allowance">
-                <div>수당2</div>
-                <div><input type="checkbox" id="masterAllowance2" class="checkbox-custom" onclick="toggleAllowanceColumn(2, this)"></div>
-              </th>
-              <th class="col-allowance">
-                <div>수당3</div>
-                <div><input type="checkbox" id="masterAllowance3" class="checkbox-custom" onclick="toggleAllowanceColumn(3, this)"></div>
-              </th>
-              <th class="col-allowance">
-                <div>수당4</div>
-                <div><input type="checkbox" id="masterAllowance4" class="checkbox-custom" onclick="toggleAllowanceColumn(4, this)"></div>
-              </th>
+              <th class="col-allowance">수당1</th>
+              <th class="col-allowance">수당2</th>
+              <th class="col-allowance">수당3</th>
+              <th class="col-allowance">수당4</th>
             </tr>
           </thead>
           <tbody id="allowanceTableBody">
@@ -779,15 +780,15 @@
 
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} },
-        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false, allowances: {1:"", 2:"", 3:"", 4:""}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false, allowances: {1:"", 2:"", 3:"", 4:""}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false, allowances: {1:"", 2:"", 3:"", 4:""}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false, allowances: {1:"", 2:"", 3:"", 4:""}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false, allowances: {1:"", 2:"", 3:"", 4:""}, reductions: {1:false, 2:false, 3:false} }
       ]
     };
 
@@ -977,9 +978,6 @@
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
 
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById(`masterAllowance${i}`).checked = false;
-      }
       renderAllowanceTable(filteredData);
       document.getElementById("btnSaveAllowance").disabled = false;
     }
@@ -998,31 +996,23 @@
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
-          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-1" ${item.allowances[1] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 1, this.checked)"></td>
-          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-2" ${item.allowances[2] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 2, this.checked)"></td>
-          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-3" ${item.allowances[3] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 3, this.checked)"></td>
-          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-4" ${item.allowances[4] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 4, this.checked)"></td>
+          <td class="col-allowance"><input type="text" class="input-table-cell" value="${item.allowances[1]}" placeholder="금액 입력" oninput="updateAllowanceData('${item.id}', 1, this.value)"></td>
+          <td class="col-allowance"><input type="text" class="input-table-cell" value="${item.allowances[2]}" placeholder="금액 입력" oninput="updateAllowanceData('${item.id}', 2, this.value)"></td>
+          <td class="col-allowance"><input type="text" class="input-table-cell" value="${item.allowances[3]}" placeholder="금액 입력" oninput="updateAllowanceData('${item.id}', 3, this.value)"></td>
+          <td class="col-allowance"><input type="text" class="input-table-cell" value="${item.allowances[4]}" placeholder="금액 입력" oninput="updateAllowanceData('${item.id}', 4, this.value)"></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    function updateAllowanceData(id, colNum, isChecked) {
+    function updateAllowanceData(id, colNum, val) {
       const selectedInst = document.getElementById("institutionSelect2").value;
       if (mockTargetData[selectedInst]) {
         const target = mockTargetData[selectedInst].find(item => item.id === id);
         if (target) {
-          target.allowances[colNum] = isChecked;
+          target.allowances[colNum] = val;
         }
       }
-    }
-
-    function toggleAllowanceColumn(colNum, masterCb) {
-      const checkboxes = document.querySelectorAll(`.allowance-cb-${colNum}`);
-      checkboxes.forEach(cb => {
-        cb.checked = masterCb.checked;
-        cb.dispatchEvent(new Event('change'));
-      });
     }
 
     function handleSaveAllowance() {
