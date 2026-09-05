@@ -357,9 +357,10 @@
     initDocCards();
     renderApprovalGrid();
   });
-
+  
+    <!-- 문서관리카드 -->
   function initDocCards() {
-    const cards = ["선택하세요", "국가정책수립", "복무관리", "인사징계업무", "교육및연수", "일반행정업무"];
+    const cards = ["선택하세요", "국정관리", "인사", "복무", "교육훈련", "징계소청", "감사청렴", "회계", "업무추진비", "예결산", "보수급여"];
     const select = document.getElementById('doc-card-select');
     cards.forEach(c => {
       const opt = document.createElement('option');
