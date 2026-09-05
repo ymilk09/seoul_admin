@@ -916,10 +916,8 @@
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
       
-      handleSearchTarget();
-      handleSearchAllowance();
-      handleSearchReduction();
-      handleSearchClose();
+      // 자동 조회 함수 호출 코드를 제거하여, 사용자가 직접 [조회]를 눌러야만 데이터를 불러오도록 합니다.
+      
     }
 
     function switchTab(tabId, btn) {
