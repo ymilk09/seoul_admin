@@ -6,7 +6,6 @@
   <title>SEOUL MY SOUL</title>
   <link rel="icon" href="./favicon.ico" type="image/x-icon">  
 
-  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -568,17 +567,24 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const currentItem = this.parentElement;
-          
-          document.querySelectorAll('.nav-item').forEach(item => {
-            if (item !== currentItem) {
-              item.classList.remove('active');
-            }
-          });
-          
-          currentItem.classList.toggle('active');
+          const href = this.getAttribute('href');
+
+          // href가 '#'이거나 비어있는 경우에만 드롭다운 토글 및 기본 이동 막기
+          if (!href || href === '#') {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const currentItem = this.parentElement;
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+              if (item !== currentItem) {
+                item.classList.remove('active');
+              }
+            });
+            
+            currentItem.classList.toggle('active');
+          }
+          // 'approval.html' 같은 실제 파일 링크는 e.preventDefault()를 타지 않으므로 정상 이동함
         });
       });
 
