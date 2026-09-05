@@ -279,7 +279,7 @@
       background-color: #5b73e8;
     }
 
-    /* 상단 컨트롤 바 및 타이틀 바 */
+    /* 상단 컨트롤 바 */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -287,13 +287,6 @@
       margin-bottom: 20px;
       background-color: #ffffff;
       padding: 6px 0;
-    }
-
-    .active-file-title {
-      font-family: 'SeoulHangangEB', sans-serif;
-      font-size: 1.1rem;
-      color: #1e293b;
-      font-weight: bold;
     }
 
     .select-group {
@@ -439,6 +432,48 @@
       border-color: #5b73e8;
     }
 
+    /* 파일 생성 탭 전용 일반 폰트 및 넓은 입력칸 스타일 */
+    .file-create-wrapper {
+      display: flex; 
+      flex-direction: column; 
+      gap: 18px; 
+      max-width: 650px; 
+      padding: 20px 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .file-create-row {
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+    }
+
+    .file-create-label {
+      width: 130px; 
+      font-weight: 600; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1e293b;
+    }
+
+    .file-create-input {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      outline: none;
+      background-color: #fff;
+    }
+
+    .file-create-input:focus {
+      border-color: #5b73e8;
+    }
+
+    .file-create-input:disabled {
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+
     tr:hover td {
       background-color: #f8fafc;
     }
@@ -549,27 +584,27 @@
 
     <!-- 1. 파일 생성 탭 -->
     <div id="fileCreateTab" class="tab-content active">
-      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 600px; padding: 20px 0; font-family: 'SeoulHangangL', sans-serif;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label style="width: 130px; font-weight: bold; font-family: 'SeoulHangangEB', sans-serif;">급여 작업 기관</label>
-          <select id="fileCreateInstSelect" class="select-box" style="flex: 1;"></select>
+      <div class="file-create-wrapper">
+        <div class="file-create-row">
+          <label class="file-create-label">급여 작업 기관</label>
+          <select id="fileCreateInstSelect" class="file-create-input" style="flex: 1;"></select>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label style="width: 130px; font-weight: bold; font-family: 'SeoulHangangEB', sans-serif;">작성 기간</label>
+        <div class="file-create-row">
+          <label class="file-create-label">작성 기간</label>
           <div style="display: flex; align-items: center; gap: 6px;">
-            <input type="text" id="inputYear" class="input-custom" style="width: 70px; text-align: center;" placeholder="2026"> 년 
-            <input type="text" id="inputMonth" class="input-custom" style="width: 50px; text-align: center;" placeholder="03"> 월 급여대장 작성
+            <input type="text" id="inputYear" class="file-create-input" style="width: 80px; text-align: center;" placeholder="2026"> 년 
+            <input type="text" id="inputMonth" class="file-create-input" style="width: 60px; text-align: center;" placeholder="08"> 월 급여대장 작성
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label style="width: 130px; font-weight: bold; font-family: 'SeoulHangangEB', sans-serif;">소속 기관장</label>
-          <input type="text" id="inputBossName" class="input-custom" style="flex: 1; text-align: left;" placeholder="성명 입력">
-          <input type="text" id="inputBossPhone" class="input-custom" style="flex: 1; text-align: left;" placeholder="연락처 입력">
+        <div class="file-create-row">
+          <label class="file-create-label">소속 기관장</label>
+          <input type="text" id="inputBossName" class="file-create-input" style="flex: 1;" placeholder="성명 입력">
+          <input type="text" id="inputBossPhone" class="file-create-input" style="flex: 1;" placeholder="연락처 입력">
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label style="width: 130px; font-weight: bold; font-family: 'SeoulHangangEB', sans-serif;">급여 담당자</label>
-          <input type="text" class="input-custom" style="flex: 1; text-align: left;" value="홍길동 (자동입력)" disabled>
-          <input type="text" class="input-custom" style="flex: 1; text-align: left;" value="010-1234-5678 (자동입력)" disabled>
+        <div class="file-create-row">
+          <label class="file-create-label">급여 담당자</label>
+          <input type="text" id="inputMyName" class="file-create-input" style="flex: 1;" disabled>
+          <input type="text" id="inputMyPhone" class="file-create-input" style="flex: 1;" disabled>
         </div>
         <div style="margin-top: 10px;">
           <button class="btn-action" onclick="handleFileCreateStart()">시작</button>
@@ -580,8 +615,11 @@
     <!-- 2. 대상자 선정 탭 -->
     <div id="targetTab" class="tab-content">
       <div class="top-bar">
-        <div id="targetTitle" class="active-file-title">파일을 먼저 생성해주세요.</div>
+        <div class="select-group">
+          <select id="institutionSelect1" class="select-box"></select>
+        </div>
         <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchTarget()">조회</button>
           <button id="btnSaveTarget" class="btn-action" onclick="handleSaveTarget()" disabled>저장</button>
         </div>
       </div>
@@ -606,7 +644,7 @@
           <tbody id="targetTableBody">
             <tr>
               <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                [파일 생성] 탭에서 기관 및 기간을 설정하고 [시작] 버튼을 눌러주세요.
+                드롭다운에서 기관을 선택한 후 [조회] 버튼을 눌러주세요.
               </td>
             </tr>
           </tbody>
@@ -617,8 +655,11 @@
     <!-- 3. 수당처리 탭 -->
     <div id="allowanceTab" class="tab-content">
       <div class="top-bar">
-        <div id="allowanceTitle" class="active-file-title">파일을 먼저 생성해주세요.</div>
+        <div class="select-group">
+          <select id="institutionSelect2" class="select-box"></select>
+        </div>
         <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchAllowance()">조회</button>
           <button id="btnSaveAllowance" class="btn-action" onclick="handleSaveAllowance()" disabled>저장</button>
         </div>
       </div>
@@ -652,7 +693,7 @@
           <tbody id="allowanceTableBody">
             <tr>
               <td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                [파일 생성] 완료 후 '대상자 선정'에서 체크된 대상자만 조회됩니다.
+                기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -663,8 +704,11 @@
     <!-- 4. 감액처리 탭 -->
     <div id="reductionTab" class="tab-content">
       <div class="top-bar">
-        <div id="reductionTitle" class="active-file-title">파일을 먼저 생성해주세요.</div>
+        <div class="select-group">
+          <select id="institutionSelect3" class="select-box"></select>
+        </div>
         <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchReduction()">조회</button>
           <button id="btnSaveReduction" class="btn-action" onclick="handleSaveReduction()" disabled>저장</button>
         </div>
       </div>
@@ -694,7 +738,7 @@
           <tbody id="reductionTableBody">
             <tr>
               <td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                [파일 생성] 완료 후 '대상자 선정'에서 체크된 대상자만 조회됩니다.
+                기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -705,8 +749,11 @@
     <!-- 5. 마감 탭 -->
     <div id="closeTab" class="tab-content">
       <div class="top-bar">
-        <div id="closeTitle" class="active-file-title">파일을 먼저 생성해주세요.</div>
+        <div class="select-group">
+          <select id="institutionSelect4" class="select-box"></select>
+        </div>
         <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchClose()">조회</button>
           <button id="btnCloseAction" class="btn-action" onclick="handleExecuteClose()" disabled>마감실행</button>
         </div>
       </div>
@@ -726,7 +773,7 @@
           <tbody id="closeTableBody">
             <tr>
               <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                [파일 생성] 완료 후 마감 대상 현황이 조회됩니다.
+                기관 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -741,8 +788,8 @@
 
     let currentActiveFile = {
       isCreated: false,
-      year: "",
-      month: "",
+      year: "2026",
+      month: "08",
       institution: ""
     };
 
@@ -798,29 +845,56 @@
     };
 
     function initDropdowns() {
-      const select = document.getElementById("fileCreateInstSelect");
-      select.innerHTML = "";
-      const defaultOption = document.createElement("option");
-      defaultOption.value = "";
-      defaultOption.textContent = "급여 작업할 기관을 선택하세요";
-      defaultOption.disabled = true;
-      defaultOption.selected = true;
-      select.appendChild(defaultOption);
+      const selects = [
+        document.getElementById("fileCreateInstSelect"),
+        document.getElementById("institutionSelect1"), 
+        document.getElementById("institutionSelect2"),
+        document.getElementById("institutionSelect3"),
+        document.getElementById("institutionSelect4")
+      ];
 
-      institutions.forEach(inst => {
-        const option = document.createElement("option");
-        option.value = inst;
-        option.textContent = inst;
-        select.appendChild(option);
+      selects.forEach(select => {
+        select.innerHTML = "";
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "급여 작업할 기관을 선택하세요";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        select.appendChild(defaultOption);
+
+        institutions.forEach(inst => {
+          const option = document.createElement("option");
+          option.value = inst;
+          // 요구하신 드롭다운 포맷 적용 (2026년 8월 서울특별시...)
+          option.textContent = `2026년 8월 ${inst} 공무원 급여대장`;
+          select.appendChild(option);
+        });
       });
+
+      // 로그인된 사용자 정보를 세션에서 가져와 급여 담당자 칸에 자동 입력
+      const currentUserStr = sessionStorage.getItem('currentUser');
+      let userName = "홍길동";
+      let userPhone = "010-1234-5678";
+      if (currentUserStr) {
+        try {
+          const userObj = JSON.parse(currentUserStr);
+          if (userObj.name) userName = userObj.name;
+          if (userObj.phone) userPhone = userObj.phone;
+        } catch (err) {
+          userName = currentUserStr;
+        }
+      }
+      document.getElementById("inputMyName").value = `${userName} (내 정보)`;
+      document.getElementById("inputMyPhone").value = userPhone;
     }
 
     function handleFileCreateStart() {
-      const inst = document.getElementById("fileCreateInstSelect").value;
+      const selectElem = document.getElementById("fileCreateInstSelect");
+      const selectedValue = selectElem.value;
       const year = document.getElementById("inputYear").value.trim();
       const month = document.getElementById("inputMonth").value.trim();
 
-      if (!inst) {
+      if (!selectedValue) {
         alert("급여 작업할 기관을 선택하세요.");
         return;
       }
@@ -833,53 +907,66 @@
         isCreated: true,
         year: year,
         month: month,
-        institution: inst
+        institution: selectedValue
       };
+
+      // 다른 탭들의 드롭다운도 동일하게 선택값 동기화
+      ['institutionSelect1', 'institutionSelect2', 'institutionSelect3', 'institutionSelect4'].forEach(id => {
+        document.getElementById(id).value = selectedValue;
+      });
 
       alert("급여대장 파일이 생성되었습니다. [대상자 선정] 탭으로 이동합니다.");
 
-      // '대상자 선정' 탭 버튼을 강제로 클릭하여 이동 및 데이터 자동 조회 실행
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
     }
 
-    // 탭 전환 함수
+    // 탭 전환 시 다른 탭의 조회 데이터 초기화 및 싱크 맞추기
     function switchTab(tabId, btn) {
-      // 파일이 생성되지 않은 상태에서 파일 생성 탭 외의 탭을 누를 경우 차단
-      if (!currentActiveFile.isCreated && tabId !== 'fileCreateTab') {
-        alert("먼저 [파일 생성] 탭에서 기관 및 기간을 설정하고 [시작]을 눌러주세요.");
-        return;
-      }
-
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
 
-      // 탭 진입 시 자동 데이터 반영
-      if (currentActiveFile.isCreated) {
-        const titleText = `${currentActiveFile.year}년 ${currentActiveFile.month}월 ${currentActiveFile.institution} 공무원 급여대장`;
-        
-        if (tabId === 'targetTab') {
-          document.getElementById("targetTitle").textContent = titleText;
-          autoSearchTarget();
-        } else if (tabId === 'allowanceTab') {
-          document.getElementById("allowanceTitle").textContent = titleText;
-          autoSearchAllowance();
-        } else if (tabId === 'reductionTab') {
-          document.getElementById("reductionTitle").textContent = titleText;
-          autoSearchReduction();
-        } else if (tabId === 'closeTab') {
-          document.getElementById("closeTitle").textContent = titleText;
-          autoSearchClose();
+      resetAllTablesAndSelections(tabId);
+    }
+
+    function resetAllTablesAndSelections(activeTabId) {
+      const selects = ['institutionSelect1', 'institutionSelect2', 'institutionSelect3', 'institutionSelect4'];
+      const targetTabIds = ['targetTab', 'allowanceTab', 'reductionTab', 'closeTab'];
+      
+      selects.forEach((selId, idx) => {
+        if (targetTabIds[idx] !== activeTabId && currentActiveFile.institution) {
+          document.getElementById(selId).value = currentActiveFile.institution;
         }
+      });
+
+      if (activeTabId !== 'targetTab' && activeTabId !== 'fileCreateTab') {
+        document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">드롭다운에서 기관을 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
+        document.getElementById("btnSaveTarget").disabled = true;
+      }
+      if (activeTabId !== 'allowanceTab' && activeTabId !== 'fileCreateTab') {
+        document.getElementById("allowanceTableBody").innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveAllowance").disabled = true;
+      }
+      if (activeTabId !== 'reductionTab' && activeTabId !== 'fileCreateTab') {
+        document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveReduction").disabled = true;
+      }
+      if (activeTabId !== 'closeTab' && activeTabId !== 'fileCreateTab') {
+        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.</td></tr>`;
+        document.getElementById("btnCloseAction").disabled = true;
       }
     }
 
-    // 1. [대상자 선정] 자동 조회
-    function autoSearchTarget() {
-      const selectedInst = currentActiveFile.institution;
+    // 1. [대상자 선정] 수동 조회
+    function handleSearchTarget() {
+      const selectedInst = document.getElementById("institutionSelect1").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
       const data = mockTargetData[selectedInst] || [];
       renderTargetTable(data);
       document.getElementById("btnSaveTarget").disabled = false;
@@ -909,7 +996,7 @@
     }
 
     function updateTargetStatus(index, isChecked) {
-      const selectedInst = currentActiveFile.institution;
+      const selectedInst = document.getElementById("institutionSelect1").value;
       if (mockTargetData[selectedInst] && mockTargetData[selectedInst][index]) {
         mockTargetData[selectedInst][index].isTarget = isChecked;
       }
@@ -917,7 +1004,7 @@
     }
 
     function toggleSelectAll(selectAllCb) {
-      const selectedInst = currentActiveFile.institution;
+      const selectedInst = document.getElementById("institutionSelect1").value;
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
       rowCheckboxes.forEach((cb, idx) => {
         cb.checked = selectAllCb.checked;
@@ -942,9 +1029,13 @@
       alert("저장되었습니다.");
     }
 
-    // 2. [수당처리] 자동 조회
-    function autoSearchAllowance() {
-      const selectedInst = currentActiveFile.institution;
+    // 2. [수당처리] 수동 조회
+    function handleSearchAllowance() {
+      const selectedInst = document.getElementById("institutionSelect2").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
 
@@ -1021,9 +1112,13 @@
       alert("저장되었습니다.");
     }
 
-    // 3. [감액처리] 자동 조회
-    function autoSearchReduction() {
-      const selectedInst = currentActiveFile.institution;
+    // 3. [감액처리] 수동 조회
+    function handleSearchReduction() {
+      const selectedInst = document.getElementById("institutionSelect3").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
 
@@ -1100,9 +1195,13 @@
       alert("저장되었습니다.");
     }
 
-    // 4. [마감] 자동 조회
-    function autoSearchClose() {
-      const selectedInst = currentActiveFile.institution;
+    // 4. [마감] 수동 조회
+    function handleSearchClose() {
+      const selectedInst = document.getElementById("institutionSelect4").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
       const data = mockTargetData[selectedInst] || [];
       renderCloseTable(data);
       document.getElementById("btnCloseAction").disabled = false;
@@ -1130,13 +1229,13 @@
     }
 
     function handleExecuteClose() {
-      const selectedInst = currentActiveFile.institution;
+      const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) return;
       if (confirm('해당 기관의 급여 내역을 마감하시겠습니까?')) {
         if (mockTargetData[selectedInst]) {
           mockTargetData[selectedInst].forEach(item => item.isClosed = true);
         }
-        autoSearchClose();
+        handleSearchClose();
         alert("마감되었습니다.");
       }
     }
