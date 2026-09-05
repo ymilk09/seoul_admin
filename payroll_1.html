@@ -775,7 +775,6 @@
       "서울특별시소방재난본부"
     ];
 
-    // 이미 생성된 파일 목록 저장소
     let createdFiles = [];
 
     const mockTargetData = {
@@ -794,6 +793,7 @@
 
     function initFileCreateDropdown() {
       const select = document.getElementById("fileCreateInstSelect");
+      if (!select) return;
       select.innerHTML = "";
       const defaultOption = document.createElement("option");
       defaultOption.value = "";
@@ -819,6 +819,7 @@
       ];
 
       selects.forEach(select => {
+        if (!select) return;
         const currentVal = select.value;
         select.innerHTML = "";
         const defaultOption = document.createElement("option");
@@ -868,7 +869,6 @@
         return;
       }
 
-      // 이미 파일이 만들어졌는지 확인
       const alreadyExists = createdFiles.some(f => f.institution === selectedValue);
       if (alreadyExists) {
         alert("이미 해당 기관의 급여대장 파일이 생성되어 있습니다.");
@@ -900,7 +900,6 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    // 1. [대상자 선정] 조회
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
       if (!selectedInst) {
@@ -969,7 +968,6 @@
       alert("저장되었습니다.");
     }
 
-    // 2. [수당처리] 조회
     function handleSearchAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
       if (!selectedInst) {
@@ -1031,7 +1029,6 @@
       alert("수당처리가 저장되었습니다.");
     }
 
-    // 3. [감액처리] 조회
     function handleSearchReduction() {
       const selectedInst = document.getElementById("institutionSelect3").value;
       if (!selectedInst) {
@@ -1092,7 +1089,6 @@
       alert("감액처리가 저장되었습니다.");
     }
 
-    // 4. [마감] 조회 및 마감 실행
     function handleSearchClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) {
@@ -1140,15 +1136,21 @@
             }
           });
         }
-        alert("마감 처리되었습니다.");
+        alert("마감되었습니다.");
         handleSearchClose();
       }
     }
 
-    window.onload = function() {
+    // 페이지 로드 시 즉시 실행되도록 보장
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initFileCreateDropdown();
+        updateCreatedFileDropdowns();
+      });
+    } else {
       initFileCreateDropdown();
       updateCreatedFileDropdowns();
-    };
+    }
   </script>
 
 </body>
