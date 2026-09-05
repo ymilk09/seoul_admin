@@ -1265,12 +1265,12 @@
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) return;
 
-      const confirmMessage = "해당 급여대장을 최종 마감하시겠습니까?";
+      const confirmMessage = "마감하시겠습니까?";
       if (confirm(confirmMessage)) {
         if (workflowStatus[selectedInst]) {
           workflowStatus[selectedInst].isClosed = true;
         }
-        alert("마감되었습니다.");
+        alert("마감되었습니다. 급여대장 제출 메뉴로 이동하여 최종 마감해주세요.");
         handleSearchClose();
       }
     }
