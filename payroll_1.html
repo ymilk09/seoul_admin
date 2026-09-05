@@ -16,10 +16,24 @@
   </script>
 
   <style>
-    /* 웹폰트 정의: SeoulHangangEB.ttf */
+    /* 웹폰트 정의 */
+    @font-face {
+      font-family: 'SeoulAlrim';
+      src: url('fonts/SeoulAlrimTTF-Bold.ttf') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
+
     @font-face {
       font-family: 'SeoulHangangEB';
-      src: url('/fonts/SeoulHangangEB.ttf') format('truetype');
+      src: url('fonts/SeoulHangangEB.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SeoulHangangL';
+      src: url('fonts/SeoulHangangL.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
     }
@@ -28,7 +42,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'SeoulAlrim', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -235,7 +249,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* 상단 서브 메뉴 탭 (서울한강체 전용 적용 및 볼드감 완화) */
+    /* 상단 서브 메뉴 탭 */
     .tab-menu {
       display: flex;
       gap: 30px;
@@ -246,9 +260,9 @@
     .tab-btn {
       background: none;
       border: none;
-      font-family: 'SeoulHangangEB', sans-serif; /* 서브메뉴 전용 폰트 */
+      font-family: 'SeoulAlrim', sans-serif;
       font-size: 1.1rem;
-      font-weight: normal; /* 너무 볼드하지 않게 설정 */
+      font-weight: bold;
       color: #000000;
       padding-bottom: 10px;
       cursor: pointer;
@@ -348,14 +362,18 @@
       text-overflow: ellipsis;
     }
 
+    /* 표 첫 번째 행(헤더) - SeoulHangangEB 적용 */
     th {
       background-color: #f8fafc;
-      font-weight: 700;
+      font-family: 'SeoulHangangEB', sans-serif;
+      font-weight: normal;
       color: #1e293b;
       height: 38px;
     }
 
+    /* 표 안 내용 - SeoulHangangL 적용 */
     td {
+      font-family: 'SeoulHangangL', sans-serif;
       height: 36px;
     }
 
@@ -366,8 +384,8 @@
     .col-rank { width: 12%; }
     .col-date { width: 16%; }
     .col-target { width: 8%; }
-    
     .col-allowance { width: 14%; }
+    .col-reduction { width: 14%; }
 
     .checkbox-custom {
       width: 15px;
@@ -384,32 +402,34 @@
       justify-content: center;
       gap: 4px;
       font-size: 0.85rem;
+      font-family: 'SeoulHangangEB', sans-serif;
     }
 
-    /* 수당 입력 텍스트박스 스타일 */
-    .allowance-input-group {
+    /* 입력 텍스트박스 스타일 */
+    .input-group-center {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
 
-    .input-allowance {
+    .input-custom {
       width: 80px;
       padding: 3px 6px;
       font-size: 0.8rem;
+      font-family: 'SeoulHangangL', sans-serif;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
       text-align: right;
       outline: none;
     }
 
-    .input-allowance:disabled {
+    .input-custom:disabled {
       background-color: #f1f5f9;
       color: #94a3b8;
     }
 
-    .input-allowance:focus {
+    .input-custom:focus {
       border-color: #5b73e8;
     }
 
@@ -448,7 +468,7 @@
     </div>
   </div>
 
-<header class="navbar">
+  <header class="navbar">
     <div class="nav-container">
       <ul class="nav-menu">
         <li class="nav-item">
@@ -514,18 +534,18 @@
 
   <main class="main-container">
     <div class="tab-menu">
-      <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 생성</button>
+      <button class="tab-btn active" onclick="switchTab('targetTab', this)">대상자 선정</button>
       <button class="tab-btn" onclick="switchTab('allowanceTab', this)">수당처리</button>
       <button class="tab-btn" onclick="switchTab('reductionTab', this)">감액처리</button>
+      <button class="tab-btn" onclick="switchTab('closeTab', this)">마감</button>
     </div>
 
+    <!-- 1. 대상자 선정 탭 -->
     <div id="targetTab" class="tab-content active">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect1" class="select-box">
-          </select>
+          <select id="institutionSelect1" class="select-box"></select>
         </div>
-        
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchTarget()">조회</button>
           <button id="btnSaveTarget" class="btn-action" onclick="handleSaveTarget()" disabled>저장</button>
@@ -560,13 +580,12 @@
       </div>
     </div>
 
+    <!-- 2. 수당처리 탭 -->
     <div id="allowanceTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect2" class="select-box">
-          </select>
+          <select id="institutionSelect2" class="select-box"></select>
         </div>
-        
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchAllowance()">조회</button>
           <button id="btnSaveAllowance" class="btn-action" onclick="handleSaveAllowance()" disabled>저장</button>
@@ -602,7 +621,7 @@
           <tbody id="allowanceTableBody">
             <tr>
               <td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                기관 선택 후 [조회]를 누르면 '대상자 생성'에서 체크된 대상자만 조회됩니다.
+                기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
               </td>
             </tr>
           </tbody>
@@ -610,23 +629,91 @@
       </div>
     </div>
 
+    <!-- 3. 감액처리 탭 -->
     <div id="reductionTab" class="tab-content">
-      <div style="padding: 50px 0; text-align: center; color: #64748b; font-weight: 600; font-size: 0.95rem;">
-        감액처리 기능 화면입니다.
+      <div class="top-bar">
+        <div class="select-group">
+          <select id="institutionSelect3" class="select-box"></select>
+        </div>
+        <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchReduction()">조회</button>
+          <button id="btnSaveReduction" class="btn-action" onclick="handleSaveReduction()" disabled>저장</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-seq">순번</th>
+              <th class="col-name">성명</th>
+              <th class="col-id">고유번호</th>
+              <th class="col-rank">직급</th>
+              <th class="col-reduction">
+                <div>결근감액</div>
+                <div><input type="checkbox" id="masterReduction1" class="checkbox-custom" onclick="toggleReductionColumn(1, this)"></div>
+              </th>
+              <th class="col-reduction">
+                <div>지각감액</div>
+                <div><input type="checkbox" id="masterReduction2" class="checkbox-custom" onclick="toggleReductionColumn(2, this)"></div>
+              </th>
+              <th class="col-reduction">
+                <div>기타감액</div>
+                <div><input type="checkbox" id="masterReduction3" class="checkbox-custom" onclick="toggleReductionColumn(3, this)"></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="reductionTableBody">
+            <tr>
+              <td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
+                기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. 마감 탭 -->
+    <div id="closeTab" class="tab-content">
+      <div class="top-bar">
+        <div class="select-group">
+          <select id="institutionSelect4" class="select-box"></select>
+        </div>
+        <div class="btn-group">
+          <button class="btn-action" onclick="handleSearchClose()">조회</button>
+          <button id="btnCloseAction" class="btn-action" onclick="handleExecuteClose()" disabled>마감실행</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-seq">순번</th>
+              <th class="col-name">성명</th>
+              <th class="col-id">고유번호</th>
+              <th class="col-rank">직급</th>
+              <th class="col-date">임용일</th>
+              <th class="col-target">마감상태</th>
+            </tr>
+          </thead>
+          <tbody id="closeTableBody">
+            <tr>
+              <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
+                기관 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </main>
 
   <script>
-    // 수당별 고정 기본값 저장 객체 (단일 관리)
-    const defaultAllowanceValues = {
-      1: 100000,
-      2: 50000,
-      3: 30000,
-      4: 20000
-    };
+    const defaultAllowanceValues = { 1: 100000, 2: 50000, 3: 30000, 4: 20000 };
+    const defaultReductionValues = { 1: 20000, 2: 10000, 3: 5000 };
 
-    // 로그아웃
     function handleLogout(e) {
       if (e) e.preventDefault();
       if (confirm('정말 로그아웃하시겠습니까?')) {
@@ -635,16 +722,13 @@
       }
     }
 
-    // 네비게이션 메뉴 이벤트
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const currentItem = this.parentElement;
-
         document.querySelectorAll('.nav-item').forEach(item => {
           if (item !== currentItem) item.classList.remove('active');
         });
-
         currentItem.classList.toggle('active');
       });
     });
@@ -661,7 +745,6 @@
       }
     });
 
-    // --- 데이터 및 비즈니스 로직 ---
     const institutions = [
       "서울특별시청", 
       "서울특별시경찰청", 
@@ -670,24 +753,28 @@
 
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true },
-        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false }
       ]
     };
 
     function initDropdowns() {
-      const selects = [document.getElementById("institutionSelect1"), document.getElementById("institutionSelect2")];
+      const selects = [
+        document.getElementById("institutionSelect1"), 
+        document.getElementById("institutionSelect2"),
+        document.getElementById("institutionSelect3"),
+        document.getElementById("institutionSelect4")
+      ];
 
       selects.forEach(select => {
         select.innerHTML = "";
-
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
         defaultOption.textContent = "급여 작업할 기관";
@@ -704,6 +791,7 @@
       });
     }
 
+    // 탭 전환 시 다른 탭의 조회 데이터 초기화 및 싱크
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -711,23 +799,46 @@
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
 
-      const select1 = document.getElementById("institutionSelect1");
-      const select2 = document.getElementById("institutionSelect2");
-      if (tabId === 'allowanceTab' && select1.value) {
-        select2.value = select1.value;
-      } else if (tabId === 'targetTab' && select2.value) {
-        select1.value = select2.value;
+      // 탭 이동 시 기존 조회 내역 초기화
+      resetAllTablesAndSelections(tabId);
+    }
+
+    function resetAllTablesAndSelections(activeTabId) {
+      const selects = ['institutionSelect1', 'institutionSelect2', 'institutionSelect3', 'institutionSelect4'];
+      
+      selects.forEach((selId, idx) => {
+        const currentTabNum = idx + 1;
+        const targetTabIds = ['targetTab', 'allowanceTab', 'reductionTab', 'closeTab'];
+        if (targetTabIds[idx] !== activeTabId) {
+          document.getElementById(selId).value = "";
+        }
+      });
+
+      if (activeTabId !== 'targetTab') {
+        document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">드롭다운에서 기관을 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
+        document.getElementById("btnSaveTarget").disabled = true;
+      }
+      if (activeTabId !== 'allowanceTab') {
+        document.getElementById("allowanceTableBody").innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveAllowance").disabled = true;
+      }
+      if (activeTabId !== 'reductionTab') {
+        document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveReduction").disabled = true;
+      }
+      if (activeTabId !== 'closeTab') {
+        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">기관 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.</td></tr>`;
+        document.getElementById("btnCloseAction").disabled = true;
       }
     }
 
-    // 1. [대상자 생성]
+    // 1. [대상자 선정]
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
       if (!selectedInst) {
         alert("기관을 선택하세요.");
         return;
       }
-
       const data = mockTargetData[selectedInst] || [];
       renderTargetTable(data);
       document.getElementById("btnSaveTarget").disabled = false;
@@ -736,12 +847,10 @@
     function renderTargetTable(data) {
       const tbody = document.getElementById("targetTableBody");
       tbody.innerHTML = "";
-
       if (!data || data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">조회된 대상자가 없습니다.</td></tr>`;
         return;
       }
-
       data.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -769,7 +878,6 @@
     function toggleSelectAll(selectAllCb) {
       const selectedInst = document.getElementById("institutionSelect1").value;
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-      
       rowCheckboxes.forEach((cb, idx) => {
         cb.checked = selectAllCb.checked;
         if (mockTargetData[selectedInst] && mockTargetData[selectedInst][idx]) {
@@ -782,7 +890,6 @@
       const selectAllCb = document.getElementById("selectAllCheckbox");
       const rowCheckboxes = document.querySelectorAll('.row-checkbox');
       const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-
       if (rowCheckboxes.length > 0 && rowCheckboxes.length === checkedBoxes.length) {
         selectAllCb.checked = true;
       } else {
@@ -801,15 +908,12 @@
         alert("기관을 선택하세요.");
         return;
       }
-
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
 
-      // 상단 마스터 체크박스 해제 초기화
       for (let i = 1; i <= 4; i++) {
         document.getElementById(`masterAllowance${i}`).checked = false;
       }
-
       renderAllowanceTable(filteredData);
       document.getElementById("btnSaveAllowance").disabled = false;
     }
@@ -817,12 +921,10 @@
     function renderAllowanceTable(data) {
       const tbody = document.getElementById("allowanceTableBody");
       tbody.innerHTML = "";
-
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8;">'대상자 생성'에서 선택된 대상자가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8;">대상자를 선정하시기 바랍니다.</td></tr>`;
         return;
       }
-
       data.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -832,9 +934,9 @@
           <td class="col-rank">${item.rank}</td>
           ${[1, 2, 3, 4].map(num => `
             <td class="col-allowance">
-              <div class="allowance-input-group">
+              <div class="input-group-center">
                 <input type="checkbox" class="checkbox-custom allow-cb-${num}" onchange="handleSingleAllowanceCheck(${num}, this)">
-                <input type="text" class="input-allowance allow-input-${num}" disabled value="" oninput="syncAllowanceValue(${num}, this.value)">
+                <input type="text" class="input-custom allow-input-${num}" disabled value="" oninput="syncAllowanceValue(${num}, this.value)">
               </div>
             </td>
           `).join('')}
@@ -843,11 +945,9 @@
       });
     }
 
-    // 개별 체크박스 변경 핸들러
     function handleSingleAllowanceCheck(num, cb) {
       const rowTd = cb.closest('td');
       const input = rowTd.querySelector(`.allow-input-${num}`);
-      
       if (cb.checked) {
         input.disabled = false;
         input.value = defaultAllowanceValues[num].toLocaleString();
@@ -857,28 +957,21 @@
       }
     }
 
-    // 헤더 전체 선택 핸들러 (전체 해제가 기본)
     function toggleAllowanceColumn(num, masterCb) {
       const targetCbs = document.querySelectorAll(`.allow-cb-${num}`);
       const targetInputs = document.querySelectorAll(`.allow-input-${num}`);
-      
       targetCbs.forEach(cb => cb.checked = masterCb.checked);
-      
       targetInputs.forEach(input => {
         input.disabled = !masterCb.checked;
         input.value = masterCb.checked ? defaultAllowanceValues[num].toLocaleString() : "";
       });
     }
 
-    // 동일 수당 열의 모든 값 동기화 (고정 수당 금액 적용)
     function syncAllowanceValue(num, value) {
-      // 숫자 변환 후 메모리 기본값 업데이트
       const rawVal = Number(value.replace(/,/g, ''));
       if (!isNaN(rawVal)) {
         defaultAllowanceValues[num] = rawVal;
       }
-
-      // 같은 열의 활성화된 모든 텍스트박스 동기화
       const inputs = document.querySelectorAll(`.allow-input-${num}`);
       inputs.forEach(input => {
         if (!input.disabled) {
@@ -889,6 +982,134 @@
 
     function handleSaveAllowance() {
       alert("저장되었습니다.");
+    }
+
+    // 3. [감액처리]
+    function handleSearchReduction() {
+      const selectedInst = document.getElementById("institutionSelect3").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
+      const allData = mockTargetData[selectedInst] || [];
+      const filteredData = allData.filter(item => item.isTarget);
+
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById(`masterReduction${i}`).checked = false;
+      }
+      renderReductionTable(filteredData);
+      document.getElementById("btnSaveReduction").disabled = false;
+    }
+
+    function renderReductionTable(data) {
+      const tbody = document.getElementById("reductionTableBody");
+      tbody.innerHTML = "";
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8;">'대상자 선정'에서 선택된 대상자가 없습니다.</td></tr>`;
+        return;
+      }
+      data.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="col-seq">${index + 1}</td>
+          <td class="col-name">${item.name}</td>
+          <td class="col-id">${item.id}</td>
+          <td class="col-rank">${item.rank}</td>
+          ${[1, 2, 3].map(num => `
+            <td class="col-reduction">
+              <div class="input-group-center">
+                <input type="checkbox" class="checkbox-custom reduc-cb-${num}" onchange="handleSingleReductionCheck(${num}, this)">
+                <input type="text" class="input-custom reduc-input-${num}" disabled value="" oninput="syncReductionValue(${num}, this.value)">
+              </div>
+            </td>
+          `).join('')}
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function handleSingleReductionCheck(num, cb) {
+      const rowTd = cb.closest('td');
+      const input = rowTd.querySelector(`.reduc-input-${num}`);
+      if (cb.checked) {
+        input.disabled = false;
+        input.value = defaultReductionValues[num].toLocaleString();
+      } else {
+        input.disabled = true;
+        input.value = "";
+      }
+    }
+
+    function toggleReductionColumn(num, masterCb) {
+      const targetCbs = document.querySelectorAll(`.reduc-cb-${num}`);
+      const targetInputs = document.querySelectorAll(`.reduc-input-${num}`);
+      targetCbs.forEach(cb => cb.checked = masterCb.checked);
+      targetInputs.forEach(input => {
+        input.disabled = !masterCb.checked;
+        input.value = masterCb.checked ? defaultReductionValues[num].toLocaleString() : "";
+      });
+    }
+
+    function syncReductionValue(num, value) {
+      const rawVal = Number(value.replace(/,/g, ''));
+      if (!isNaN(rawVal)) {
+        defaultReductionValues[num] = rawVal;
+      }
+      const inputs = document.querySelectorAll(`.reduc-input-${num}`);
+      inputs.forEach(input => {
+        if (!input.disabled) {
+          input.value = value;
+        }
+      });
+    }
+
+    function handleSaveReduction() {
+      alert("저장되었습니다.");
+    }
+
+    // 4. [마감]
+    function handleSearchClose() {
+      const selectedInst = document.getElementById("institutionSelect4").value;
+      if (!selectedInst) {
+        alert("기관을 선택하세요.");
+        return;
+      }
+      const data = mockTargetData[selectedInst] || [];
+      renderCloseTable(data);
+      document.getElementById("btnCloseAction").disabled = false;
+    }
+
+    function renderCloseTable(data) {
+      const tbody = document.getElementById("closeTableBody");
+      tbody.innerHTML = "";
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">조회된 내역이 없습니다.</td></tr>`;
+        return;
+      }
+      data.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="col-seq">${index + 1}</td>
+          <td class="col-name">${item.name}</td>
+          <td class="col-id">${item.id}</td>
+          <td class="col-rank">${item.rank}</td>
+          <td class="col-date">${item.date}</td>
+          <td class="col-target">${item.isClosed ? '<span style="color:#2563eb; font-weight:bold;">마감완료</span>' : '<span style="color:#64748b;">진행중</span>'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function handleExecuteClose() {
+      const selectedInst = document.getElementById("institutionSelect4").value;
+      if (!selectedInst) return;
+      if (confirm('마감하시겠습니까?')) {
+        if (mockTargetData[selectedInst]) {
+          mockTargetData[selectedInst].forEach(item => item.isClosed = true);
+        }
+        handleSearchClose();
+        alert("마감되었습니다.");
+      }
     }
 
     window.onload = function() {
