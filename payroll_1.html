@@ -832,15 +832,15 @@
 
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false },
-        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false, allowances: {1:false, 2:false, 3:false, 4:false}, reductions: {1:false, 2:false, 3:false} }
       ]
     };
 
@@ -865,13 +865,11 @@
         institutions.forEach(inst => {
           const option = document.createElement("option");
           option.value = inst;
-          // 요구하신 드롭다운 포맷 적용 (2026년 8월 서울특별시...)
           option.textContent = `2026년 8월 ${inst} 공무원 급여대장`;
           select.appendChild(option);
         });
       });
 
-      // 로그인된 사용자 정보를 세션에서 가져와 급여 담당자 칸에 자동 입력
       const currentUserStr = sessionStorage.getItem('currentUser');
       let userName = "홍길동";
       let userPhone = "010-1234-5678";
@@ -910,7 +908,6 @@
         institution: selectedValue
       };
 
-      // 다른 탭들의 드롭다운도 동일하게 선택값 동기화
       ['institutionSelect1', 'institutionSelect2', 'institutionSelect3', 'institutionSelect4'].forEach(id => {
         document.getElementById(id).value = selectedValue;
       });
@@ -921,7 +918,6 @@
       switchTab('targetTab', targetBtn);
     }
 
-    // 탭 전환 시 다른 탭의 조회 데이터 초기화 및 싱크 맞추기
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -1050,7 +1046,7 @@
       const tbody = document.getElementById("allowanceTableBody");
       tbody.innerHTML = "";
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8;">'대상자 선정'에서 선택된 대상자가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px 0;">대상자 선정된 인원이 없습니다.</td></tr>`;
         return;
       }
       data.forEach((item, index) => {
@@ -1060,56 +1056,35 @@
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
-          ${[1, 2, 3, 4].map(num => `
-            <td class="col-allowance">
-              <div class="input-group-center">
-                <input type="checkbox" class="checkbox-custom allow-cb-${num}" onchange="handleSingleAllowanceCheck(${num}, this)">
-                <input type="text" class="input-custom allow-input-${num}" disabled value="" oninput="syncAllowanceValue(${num}, this.value)">
-              </div>
-            </td>
-          `).join('')}
+          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-1" ${item.allowances[1] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 1, this.checked)"></td>
+          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-2" ${item.allowances[2] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 2, this.checked)"></td>
+          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-3" ${item.allowances[3] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 3, this.checked)"></td>
+          <td class="col-allowance"><input type="checkbox" class="checkbox-custom allowance-cb-4" ${item.allowances[4] ? 'checked' : ''} onchange="updateAllowanceData('${item.id}', 4, this.checked)"></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    function handleSingleAllowanceCheck(num, cb) {
-      const rowTd = cb.closest('td');
-      const input = rowTd.querySelector(`.allow-input-${num}`);
-      if (cb.checked) {
-        input.disabled = false;
-        input.value = defaultAllowanceValues[num].toLocaleString();
-      } else {
-        input.disabled = true;
-        input.value = "";
-      }
-    }
-
-    function toggleAllowanceColumn(num, masterCb) {
-      const targetCbs = document.querySelectorAll(`.allow-cb-${num}`);
-      const targetInputs = document.querySelectorAll(`.allow-input-${num}`);
-      targetCbs.forEach(cb => cb.checked = masterCb.checked);
-      targetInputs.forEach(input => {
-        input.disabled = !masterCb.checked;
-        input.value = masterCb.checked ? defaultAllowanceValues[num].toLocaleString() : "";
-      });
-    }
-
-    function syncAllowanceValue(num, value) {
-      const rawVal = Number(value.replace(/,/g, ''));
-      if (!isNaN(rawVal)) {
-        defaultAllowanceValues[num] = rawVal;
-      }
-      const inputs = document.querySelectorAll(`.allow-input-${num}`);
-      inputs.forEach(input => {
-        if (!input.disabled) {
-          input.value = value;
+    function updateAllowanceData(id, colNum, isChecked) {
+      const selectedInst = document.getElementById("institutionSelect2").value;
+      if (mockTargetData[selectedInst]) {
+        const target = mockTargetData[selectedInst].find(item => item.id === id);
+        if (target) {
+          target.allowances[colNum] = isChecked;
         }
+      }
+    }
+
+    function toggleAllowanceColumn(colNum, masterCb) {
+      const checkboxes = document.querySelectorAll(`.allowance-cb-${colNum}`);
+      checkboxes.forEach(cb => {
+        cb.checked = masterCb.checked;
+        cb.dispatchEvent(new Event('change'));
       });
     }
 
     function handleSaveAllowance() {
-      alert("저장되었습니다.");
+      alert("수당처리가 저장되었습니다.");
     }
 
     // 3. [감액처리] 수동 조회
@@ -1133,7 +1108,7 @@
       const tbody = document.getElementById("reductionTableBody");
       tbody.innerHTML = "";
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8;">'대상자 선정'에서 선택된 대상자가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="padding: 24px 0;">대상자 선정된 인원이 없습니다.</td></tr>`;
         return;
       }
       data.forEach((item, index) => {
@@ -1143,86 +1118,66 @@
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
-          ${[1, 2, 3].map(num => `
-            <td class="col-reduction">
-              <div class="input-group-center">
-                <input type="checkbox" class="checkbox-custom reduc-cb-${num}" onchange="handleSingleReductionCheck(${num}, this)">
-                <input type="text" class="input-custom reduc-input-${num}" disabled value="" oninput="syncReductionValue(${num}, this.value)">
-              </div>
-            </td>
-          `).join('')}
+          <td class="col-reduction"><input type="checkbox" class="checkbox-custom reduction-cb-1" ${item.reductions[1] ? 'checked' : ''} onchange="updateReductionData('${item.id}', 1, this.checked)"></td>
+          <td class="col-reduction"><input type="checkbox" class="checkbox-custom reduction-cb-2" ${item.reductions[2] ? 'checked' : ''} onchange="updateReductionData('${item.id}', 2, this.checked)"></td>
+          <td class="col-reduction"><input type="checkbox" class="checkbox-custom reduction-cb-3" ${item.reductions[3] ? 'checked' : ''} onchange="updateReductionData('${item.id}', 3, this.checked)"></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    function handleSingleReductionCheck(num, cb) {
-      const rowTd = cb.closest('td');
-      const input = rowTd.querySelector(`.reduc-input-${num}`);
-      if (cb.checked) {
-        input.disabled = false;
-        input.value = defaultReductionValues[num].toLocaleString();
-      } else {
-        input.disabled = true;
-        input.value = "";
-      }
-    }
-
-    function toggleReductionColumn(num, masterCb) {
-      const targetCbs = document.querySelectorAll(`.reduc-cb-${num}`);
-      const targetInputs = document.querySelectorAll(`.reduc-input-${num}`);
-      targetCbs.forEach(cb => cb.checked = masterCb.checked);
-      targetInputs.forEach(input => {
-        input.disabled = !masterCb.checked;
-        input.value = masterCb.checked ? defaultReductionValues[num].toLocaleString() : "";
-      });
-    }
-
-    function syncReductionValue(num, value) {
-      const rawVal = Number(value.replace(/,/g, ''));
-      if (!isNaN(rawVal)) {
-        defaultReductionValues[num] = rawVal;
-      }
-      const inputs = document.querySelectorAll(`.reduc-input-${num}`);
-      inputs.forEach(input => {
-        if (!input.disabled) {
-          input.value = value;
+    function updateReductionData(id, colNum, isChecked) {
+      const selectedInst = document.getElementById("institutionSelect3").value;
+      if (mockTargetData[selectedInst]) {
+        const target = mockTargetData[selectedInst].find(item => item.id === id);
+        if (target) {
+          target.reductions[colNum] = isChecked;
         }
+      }
+    }
+
+    function toggleReductionColumn(colNum, masterCb) {
+      const checkboxes = document.querySelectorAll(`.reduction-cb-${colNum}`);
+      checkboxes.forEach(cb => {
+        cb.checked = masterCb.checked;
+        cb.dispatchEvent(new Event('change'));
       });
     }
 
     function handleSaveReduction() {
-      alert("저장되었습니다.");
+      alert("감액처리가 저장되었습니다.");
     }
 
-    // 4. [마감] 수동 조회
+    // 4. [마감] 수동 조회 및 마감 실행 (payroll_2 마감 기능 종합 적용)
     function handleSearchClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) {
         alert("기관을 선택하세요.");
         return;
       }
-      const data = mockTargetData[selectedInst] || [];
-      renderCloseTable(data);
-      document.getElementById("btnCloseAction").disabled = false;
+      const allData = mockTargetData[selectedInst] || [];
+      const filteredData = allData.filter(item => item.isTarget);
+      renderCloseTable(filteredData);
+      document.getElementById("btnCloseAction").disabled = filteredData.length === 0;
     }
 
     function renderCloseTable(data) {
       const tbody = document.getElementById("closeTableBody");
       tbody.innerHTML = "";
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">조회된 내역이 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">마감 대상 인원이 없습니다.</td></tr>`;
         return;
       }
       data.forEach((item, index) => {
         const row = document.createElement("tr");
+        const statusText = item.isClosed ? '<span style="color: #2563eb; font-weight: bold;">마감완료</span>' : '<span style="color: #64748b;">마감전</span>';
         row.innerHTML = `
           <td class="col-seq">${index + 1}</td>
           <td class="col-name">${item.name}</td>
           <td class="col-id">${item.id}</td>
           <td class="col-rank">${item.rank}</td>
           <td class="col-date">${item.date}</td>
-          <td class="col-target">${item.isClosed ? '<span style="color:#2563eb; font-weight:bold;">마감완료</span>' : '<span style="color:#64748b;">진행중</span>'}</td>
+          <td class="col-target">${statusText}</td>
         `;
         tbody.appendChild(row);
       });
@@ -1231,12 +1186,18 @@
     function handleExecuteClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) return;
-      if (confirm('해당 기관의 급여 내역을 마감하시겠습니까?')) {
+
+      const confirmMessage = "마감하시겠습니까?";
+      if (confirm(confirmMessage)) {
         if (mockTargetData[selectedInst]) {
-          mockTargetData[selectedInst].forEach(item => item.isClosed = true);
+          mockTargetData[selectedInst].forEach(item => {
+            if (item.isTarget) {
+              item.isClosed = true;
+            }
+          });
         }
+        alert("마감 처리되었습니다.");
         handleSearchClose();
-        alert("마감되었습니다.");
       }
     }
 
