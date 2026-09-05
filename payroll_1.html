@@ -596,7 +596,7 @@
     <div id="targetTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect1" class="select-box" onchange="handleSearchTarget()"></select>
+          <select id="institutionSelect1" class="select-box"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchTarget()">조회</button>
@@ -636,7 +636,7 @@
     <div id="allowanceTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect2" class="select-box" onchange="handleSearchAllowance()"></select>
+          <select id="institutionSelect2" class="select-box"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchAllowance()">조회</button>
@@ -685,7 +685,7 @@
     <div id="reductionTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect3" class="select-box" onchange="handleSearchReduction()"></select>
+          <select id="institutionSelect3" class="select-box"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchReduction()">조회</button>
@@ -730,7 +730,7 @@
     <div id="closeTab" class="tab-content">
       <div class="top-bar">
         <div class="select-group">
-          <select id="institutionSelect4" class="select-box" onchange="handleSearchClose()"></select>
+          <select id="institutionSelect4" class="select-box"></select>
         </div>
         <div class="btn-group">
           <button class="btn-action" onclick="handleSearchClose()">조회</button>
@@ -915,9 +915,6 @@
 
       const targetBtn = document.querySelectorAll('.tab-btn')[1];
       switchTab('targetTab', targetBtn);
-      
-      // 자동 조회 함수 호출 코드를 제거하여, 사용자가 직접 [조회]를 눌러야만 데이터를 불러오도록 합니다.
-      
     }
 
     function switchTab(tabId, btn) {
@@ -926,11 +923,29 @@
 
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+
+      // 탭을 이동할 때마다 각 테이블을 초기화하여 다시 [조회]를 누르도록 설정
+      if (tabId === 'targetTab') {
+        document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일을 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
+        document.getElementById("btnSaveTarget").disabled = true;
+      } else if (tabId === 'allowanceTab') {
+        document.getElementById("allowanceTableBody").innerHTML = `<tr><td colspan="8" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveAllowance").disabled = true;
+      } else if (tabId === 'reductionTab') {
+        document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
+        document.getElementById("btnSaveReduction").disabled = true;
+      } else if (tabId === 'closeTab') {
+        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.</td></tr>`;
+        document.getElementById("btnCloseAction").disabled = true;
+      }
     }
 
     function handleSearchTarget() {
       const selectedInst = document.getElementById("institutionSelect1").value;
-      if (!selectedInst) return;
+      if (!selectedInst) {
+        alert("파일을 먼저 선택해주세요.");
+        return;
+      }
       const data = mockTargetData[selectedInst] || [];
       renderTargetTable(data);
       document.getElementById("btnSaveTarget").disabled = false;
@@ -996,7 +1011,10 @@
 
     function handleSearchAllowance() {
       const selectedInst = document.getElementById("institutionSelect2").value;
-      if (!selectedInst) return;
+      if (!selectedInst) {
+        alert("파일을 먼저 선택해주세요.");
+        return;
+      }
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
       renderAllowanceTable(filteredData);
@@ -1105,7 +1123,10 @@
 
     function handleSearchReduction() {
       const selectedInst = document.getElementById("institutionSelect3").value;
-      if (!selectedInst) return;
+      if (!selectedInst) {
+        alert("파일을 먼저 선택해주세요.");
+        return;
+      }
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
       renderReductionTable(filteredData);
@@ -1158,7 +1179,10 @@
 
     function handleSearchClose() {
       const selectedInst = document.getElementById("institutionSelect4").value;
-      if (!selectedInst) return;
+      if (!selectedInst) {
+        alert("파일을 먼저 선택해주세요.");
+        return;
+      }
       const allData = mockTargetData[selectedInst] || [];
       const filteredData = allData.filter(item => item.isTarget);
       renderCloseTable(filteredData);
