@@ -375,6 +375,10 @@
     .col-allowance { width: 14%; }
     .col-reduction { width: 14%; }
 
+    /* 마감 탭 전용 컬럼 스타일러스 */
+    .col-step { width: 20%; }
+    .col-status { width: 80%; }
+
     .checkbox-custom {
       width: 15px;
       height: 15px;
@@ -742,18 +746,14 @@
         <table>
           <thead>
             <tr>
-              <th class="col-seq">순번</th>
-              <th class="col-name">성명</th>
-              <th class="col-id">고유번호</th>
-              <th class="col-rank">직급</th>
-              <th class="col-date">임용일</th>
-              <th class="col-target">마감상태</th>
+              <th class="col-step">진행 단계</th>
+              <th class="col-status">처리 상태 현황</th>
             </tr>
           </thead>
           <tbody id="closeTableBody">
             <tr>
-              <td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
-                생성된 파일 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.
+              <td colspan="2" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">
+                생성된 파일 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.
               </td>
             </tr>
           </tbody>
@@ -802,17 +802,20 @@
 
     let createdFiles = [];
 
+    // 각 기관별 상태 객체 (파일생성, 대상자저장여부, 수당저장여부, 감액저장여부, 마감여부)
+    let workflowStatus = {};
+
     const mockTargetData = {
       "서울특별시청": [
-        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, isClosed: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} },
-        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, isClosed: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} },
-        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, isClosed: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "홍길동", id: "2026001", rank: "팀장", date: "2020-03-01", isTarget: true, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 2, name: "김철수", id: "2026002", rank: "주무관", date: "2022-07-15", isTarget: true, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} },
+        { seq: 3, name: "이영희", id: "2026003", rank: "주무관", date: "2023-01-10", isTarget: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시경찰청": [
-        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, isClosed: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "포도대장", id: "2026401", rank: "경정", date: "2018-01-10", isTarget: true, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
       ],
       "서울특별시소방재난본부": [
-        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, isClosed: false, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
+        { seq: 1, name: "강감찬", id: "2026301", rank: "소방령", date: "2019-11-01", isTarget: true, allowances: {1:{chk:false, val:""}, 2:{chk:false, val:""}, 3:{chk:false, val:""}, 4:{chk:false, val:""}}, reductions: {1:false, 2:false, 3:false} }
       ]
     };
 
@@ -906,6 +909,17 @@
         updateCreatedFileDropdowns();
       }
 
+      // 초기 상태 등록
+      if (!workflowStatus[selectedValue]) {
+        workflowStatus[selectedValue] = {
+          fileCreated: true,
+          targetSaved: false,
+          allowanceSaved: false,
+          reductionSaved: false,
+          isClosed: false
+        };
+      }
+
       document.getElementById("institutionSelect1").value = selectedValue;
       document.getElementById("institutionSelect2").value = selectedValue;
       document.getElementById("institutionSelect3").value = selectedValue;
@@ -924,7 +938,6 @@
       btn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
 
-      // 탭을 이동할 때마다 각 테이블을 초기화하여 다시 [조회]를 누르도록 설정
       if (tabId === 'targetTab') {
         document.getElementById("targetTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일을 선택한 후 [조회] 버튼을 눌러주세요.</td></tr>`;
         document.getElementById("btnSaveTarget").disabled = true;
@@ -935,7 +948,7 @@
         document.getElementById("reductionTableBody").innerHTML = `<tr><td colspan="7" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 '대상자 선정'에서 체크된 대상자만 조회됩니다.</td></tr>`;
         document.getElementById("btnSaveReduction").disabled = true;
       } else if (tabId === 'closeTab') {
-        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="6" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 마감 대상 현황이 조회됩니다.</td></tr>`;
+        document.getElementById("closeTableBody").innerHTML = `<tr><td colspan="2" style="padding: 24px 0; color: #94a3b8; font-size: 0.8rem;">생성된 파일 선택 후 [조회]를 누르면 단계별 처리 상태가 표시됩니다.</td></tr>`;
         document.getElementById("btnCloseAction").disabled = true;
       }
     }
@@ -1006,7 +1019,11 @@
     }
 
     function handleSaveTarget() {
-      alert("저장되었습니다.");
+      const selectedInst = document.getElementById("institutionSelect1").value;
+      if (workflowStatus[selectedInst]) {
+        workflowStatus[selectedInst].targetSaved = true;
+      }
+      alert("대상자 선정 내용이 저장되었습니다.");
     }
 
     function handleSearchAllowance() {
@@ -1118,6 +1135,10 @@
     }
 
     function handleSaveAllowance() {
+      const selectedInst = document.getElementById("institutionSelect2").value;
+      if (workflowStatus[selectedInst]) {
+        workflowStatus[selectedInst].allowanceSaved = true;
+      }
       alert("수당처리가 저장되었습니다.");
     }
 
@@ -1174,6 +1195,10 @@
     }
 
     function handleSaveReduction() {
+      const selectedInst = document.getElementById("institutionSelect3").value;
+      if (workflowStatus[selectedInst]) {
+        workflowStatus[selectedInst].reductionSaved = true;
+      }
       alert("감액처리가 저장되었습니다.");
     }
 
@@ -1183,29 +1208,54 @@
         alert("파일을 먼저 선택해주세요.");
         return;
       }
-      const allData = mockTargetData[selectedInst] || [];
-      const filteredData = allData.filter(item => item.isTarget);
-      renderCloseTable(filteredData);
-      document.getElementById("btnCloseAction").disabled = filteredData.length === 0;
+      renderCloseStatusTable(selectedInst);
+      
+      const status = workflowStatus[selectedInst];
+      const isAlreadyClosed = status && status.isClosed;
+      document.getElementById("btnCloseAction").disabled = isAlreadyClosed;
     }
 
-    function renderCloseTable(data) {
+    function renderCloseStatusTable(selectedInst) {
       const tbody = document.getElementById("closeTableBody");
       tbody.innerHTML = "";
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px 0;">마감 대상 인원이 없습니다.</td></tr>`;
-        return;
-      }
-      data.forEach((item, index) => {
+
+      const status = workflowStatus[selectedInst] || {
+        fileCreated: false,
+        targetSaved: false,
+        allowanceSaved: false,
+        reductionSaved: false,
+        isClosed: false
+      };
+
+      const steps = [
+        { name: "1. 파일 생성", done: status.fileCreated, desc: status.fileCreated ? "파일 생성 완료" : "미생성" },
+        { name: "2. 대상자 선정", done: status.targetSaved, desc: status.targetSaved ? "대상자 선정 저장 완료" : "미저장" },
+        { name: "3. 수당 처리", done: status.allowanceSaved, desc: status.allowanceSaved ? "수당 처리 저장 완료" : "미저장" },
+        { name: "4. 감액 처리", done: status.reductionSaved, desc: status.reductionSaved ? "감액 처리 저장 완료" : "미저장" },
+        { name: "5. 최종 마감", done: status.isClosed, desc: status.isClosed ? "마감 완료" : "마감 전" }
+      ];
+
+      steps.forEach(step => {
         const row = document.createElement("tr");
-        const statusText = item.isClosed ? '<span style="color: #2563eb; font-weight: bold;">마감완료</span>' : '<span style="color: #64748b;">마감전</span>';
+        
+        // 마감되었거나 완료된 항목 표시 방식 (마감 완료 시 전체 초록색 배경 부여 등 세련되게 처리 가능)
+        let bgStyle = "";
+        let textBadge = "";
+
+        if (step.done) {
+          if (step.name.includes("마감") && status.isClosed) {
+            bgStyle = "background-color: #d1fae5; color: #065f46; font-weight: bold;";
+            textBadge = `<span style="padding: 4px 12px; background-color: #10b981; color: white; border-radius: 4px;">${step.desc}</span>`;
+          } else {
+            textBadge = `<span style="padding: 2px 8px; background-color: #e0f2fe; color: #0369a1; border-radius: 4px; font-weight: 600;">${step.desc}</span>`;
+          }
+        } else {
+          textBadge = `<span style="color: #94a3b8;">${step.desc}</span>`;
+        }
+
         row.innerHTML = `
-          <td class="col-seq">${index + 1}</td>
-          <td class="col-name">${item.name}</td>
-          <td class="col-id">${item.id}</td>
-          <td class="col-rank">${item.rank}</td>
-          <td class="col-date">${item.date}</td>
-          <td class="col-target">${statusText}</td>
+          <td class="col-step" style="${bgStyle}">${step.name}</td>
+          <td class="col-status" style="${bgStyle}">${textBadge}</td>
         `;
         tbody.appendChild(row);
       });
@@ -1215,14 +1265,10 @@
       const selectedInst = document.getElementById("institutionSelect4").value;
       if (!selectedInst) return;
 
-      const confirmMessage = "마감하시겠습니까?";
+      const confirmMessage = "해당 급여대장을 최종 마감하시겠습니까?";
       if (confirm(confirmMessage)) {
-        if (mockTargetData[selectedInst]) {
-          mockTargetData[selectedInst].forEach(item => {
-            if (item.isTarget) {
-              item.isClosed = true;
-            }
-          });
+        if (workflowStatus[selectedInst]) {
+          workflowStatus[selectedInst].isClosed = true;
         }
         alert("마감되었습니다.");
         handleSearchClose();
